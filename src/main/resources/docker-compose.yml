@@ -1,0 +1,16 @@
+services:
+  oracle-db:
+    container_name: oracle-db
+    image: container-registry.oracle.com/database/enterprise
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_SID=${ORACLE_SID}
+      - ORACLE_PDB=${ORACLE_PDB}
+      - ORACLE_PWD=${ORACLE_PWD}
+    networks:
+      - default
+
+networks:
+ default:
+  driver: bridge
