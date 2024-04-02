@@ -1,9 +1,7 @@
-package com.mtiteiu.clinic.model;
+package com.mtiteiu.clinic.model.user;
 
+import com.mtiteiu.clinic.model.patient.PatientDetails;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,20 +20,26 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
-    @Min(5)
-    @Max(20)
-    private String userName;
-    @Min(8)
+
+    @NotNull
     private String password;
+
     @NotNull
-    @NotBlank
+    @Column(unique = true)
+    private String phoneNumber;
+
+    @NotNull
+    @Column(unique = true)
     private String email;
-    @NotNull
-    @NotBlank
-    private String CNP;
+
     private Boolean enabled;
+
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private Set<Role> roles;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST)
+    private PatientDetails patient;
 
 }
