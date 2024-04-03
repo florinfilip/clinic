@@ -1,6 +1,6 @@
 package com.mtiteiu.clinic.model.patient;
 
-import com.mtiteiu.clinic.model.user.*;
+import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.validation.ValidCNP;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -23,8 +23,9 @@ public class PatientDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @PrimaryKeyJoinColumn
     private User user;
 
     @ValidCNP

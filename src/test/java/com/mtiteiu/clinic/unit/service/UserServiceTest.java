@@ -1,4 +1,4 @@
-package com.mtiteiu.clinic.service;
+package com.mtiteiu.clinic.unit.service;
 
 import com.mtiteiu.clinic.NotFoundException;
 import com.mtiteiu.clinic.dao.UserRegistrationRequest;
@@ -8,6 +8,7 @@ import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.PatientRepository;
 import com.mtiteiu.clinic.repository.RoleRepository;
 import com.mtiteiu.clinic.repository.UserRepository;
+import com.mtiteiu.clinic.service.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

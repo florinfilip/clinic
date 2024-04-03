@@ -1,6 +1,7 @@
-package com.mtiteiu.clinic.controllers;
+package com.mtiteiu.clinic.unit.controllers;
 
 import com.mtiteiu.clinic.TestUtils;
+import com.mtiteiu.clinic.controllers.UserController;
 import com.mtiteiu.clinic.dao.UserRegistrationRequest;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.service.UserService;

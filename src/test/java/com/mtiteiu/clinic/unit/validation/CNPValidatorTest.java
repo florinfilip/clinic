@@ -1,5 +1,6 @@
-package com.mtiteiu.clinic.validation;
+package com.mtiteiu.clinic.unit.validation;
 
+import com.mtiteiu.clinic.validation.CNPValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

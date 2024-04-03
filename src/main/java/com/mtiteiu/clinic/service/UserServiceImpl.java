@@ -61,6 +61,7 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(request.getPhoneNumber())
                 .password(bCryptPasswordEncoder.encode(request.getPassword()))
                 .patient(patientDetails)
+                .enabled(true)
                 .roles(Set.of(defaultRole)).build();
 
         try {

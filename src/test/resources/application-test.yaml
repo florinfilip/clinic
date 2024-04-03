@@ -3,9 +3,9 @@ spring:
     name: clinic
 
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521/XEPDB1
-    username: ${ORACLE_USERNAME}
-    password: ${ORACLE_PASSWORD}
+    url: jdbc:oracle:thin:@localhost:1521:xe
+    username: test
+    password: password
     driver-class-name: oracle.jdbc.OracleDriver
   jpa:
     database-platform: org.hibernate.dialect.OracleDialect
