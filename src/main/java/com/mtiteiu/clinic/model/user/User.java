@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.Set;
 
@@ -17,6 +18,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
+@DynamicUpdate
 public class User {
 
     @Id
@@ -24,14 +26,14 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @NotNull
+    @NotNull(message = "You must provide a password!")
     private String password;
 
-    @NotNull
+    @NotNull(message = "Phone number cannot be null!")
     @Column(unique = true)
     private String phoneNumber;
 
-    @NotNull
+    @NotNull(message = "Email cannot be null!")
     @Column(unique = true)
     private String email;
 

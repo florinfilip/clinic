@@ -1,4 +1,4 @@
-package com.mtiteiu.clinic;
+package com.mtiteiu.clinic.exception;
 
 public class NotFoundException extends RuntimeException{
 

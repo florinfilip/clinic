@@ -3,6 +3,7 @@ package com.mtiteiu.clinic.unit.controllers;
 import com.mtiteiu.clinic.TestUtils;
 import com.mtiteiu.clinic.controllers.UserController;
 import com.mtiteiu.clinic.dao.UserRegistrationRequest;
+import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,9 @@ import java.util.List;
 
 import static com.mtiteiu.clinic.TestUtils.createDefaultUser;
 import static com.mtiteiu.clinic.TestUtils.createUser;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,8 +37,8 @@ class UserControllerTest {
     void testGetUsers() {
         //given
         List<User> userList = Arrays.asList(
-                createUser("email@email.com", "password", "0741625364"),
-                createUser("test@test.com", "password", "0782634646"));
+                createUser("email@email.com", "password", "0741625364", new PatientDetails()),
+                createUser("test@test.com", "password", "0782634646", new PatientDetails()));
         when(userService.getUsers()).thenReturn(userList);
 
         //when
@@ -45,6 +47,20 @@ class UserControllerTest {
         //then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(userList, response.getBody());
+    }
+
+    @Test
+    void getUser() {
+        //given
+        User user = createDefaultUser();
+        when(userService.getUser(anyLong())).thenReturn(user);
+
+        //when
+        ResponseEntity<User> response = userController.getUser(1L);
+
+        //then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(user, response.getBody());
     }
 
     @Test
@@ -68,10 +84,10 @@ class UserControllerTest {
         //given
         User updatedUser = createDefaultUser();
 
-        when(userService.updateUser(any(User.class))).thenReturn(updatedUser);
+        when(userService.updateUser(anyLong(), any(User.class))).thenReturn(updatedUser);
 
         //when
-        ResponseEntity<User> response = userController.updateUser(createDefaultUser());
+        ResponseEntity<User> response = userController.updateUser(1L, updatedUser);
 
         //then
         assertEquals(HttpStatus.OK, response.getStatusCode());

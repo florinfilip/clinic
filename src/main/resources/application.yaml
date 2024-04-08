@@ -3,13 +3,13 @@ spring:
     name: clinic
 
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521/XEPDB1
+    url: ${ORACLE_URL}
     username: ${ORACLE_USERNAME}
     password: ${ORACLE_PASSWORD}
     driver-class-name: oracle.jdbc.OracleDriver
   jpa:
     database-platform: org.hibernate.dialect.OracleDialect
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
 

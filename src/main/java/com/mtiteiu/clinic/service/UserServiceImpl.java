@@ -1,7 +1,8 @@
 package com.mtiteiu.clinic.service;
 
-import com.mtiteiu.clinic.NotFoundException;
+import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.dao.UserRegistrationRequest;
+import com.mtiteiu.clinic.exception.RetrievalException;
 import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.Role;
@@ -35,13 +36,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getUsers() {
-        return userRepository.findAll();
+
+        try {
+            return userRepository.findAll();
+        } catch (Exception ex) {
+            log.error("Internal error: Could not fetch the users!");
+            throw new RetrievalException("Could not fetch users from database!");
+        }
+    }
+
+    @Override
+    public User getUser(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("User with id %s not found!", id)));
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return new MyUserDetails(userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("No username with value %s found!")));
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("No username with value %s found!", email))));
     }
 
     @Override
@@ -65,7 +78,9 @@ public class UserServiceImpl implements UserService {
                 .roles(Set.of(defaultRole)).build();
 
         try {
-            return userRepository.save(newUser);
+            userRepository.save(newUser);
+            log.info("User {} created successfully!", newUser.getEmail());
+            return newUser;
         } catch (Exception ex) {
             log.error("Error while trying to save user: {} \n {}", newUser.getEmail(), ex.getMessage());
             throw new NotFoundException(String.format("Error while trying to save user %s: %s", request.getEmail(), ex.getMessage()));
@@ -73,14 +88,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) {
-        var updatedUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new NotFoundException(String.format("User with username %s not found!", user.getEmail())));
+    public User updateUser(Long id, User user) {
+        var updatedUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("User with id %s not found!", id)));
 
-        updatedUser.setPassword(user.getPassword());
+        updatedUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        updatedUser.setPhoneNumber(user.getPhoneNumber());
         updatedUser.setEmail(user.getEmail());
-        userRepository.save(updatedUser);
-
-        return userRepository.save(user);
+        log.info("User with id {} updated successfully!", id);
+        return userRepository.save(updatedUser);
     }
 }

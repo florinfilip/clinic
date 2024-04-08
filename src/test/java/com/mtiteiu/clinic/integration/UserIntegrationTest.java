@@ -37,7 +37,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles("integration")
 public class UserIntegrationTest {
 
     @Autowired
@@ -94,7 +94,6 @@ public class UserIntegrationTest {
                 .roles(Set.of(new Role("USER"))).
                 build();
 
-
         //when
         ResponseEntity<User> response = restTemplate.postForEntity("http://localhost:" + port + "/users/add", body, User.class);
 
@@ -109,15 +108,23 @@ public class UserIntegrationTest {
         var actual = optionalUser.get();
 
         assertThat(actual)
-                .extracting(User::getEmail, User::getPhoneNumber, User::getEnabled)
-                .containsExactly(expected.getEmail(), expected.getPhoneNumber(), expected.getEnabled());
+                .extracting(User::getEmail,
+                        User::getPhoneNumber,
+                        User::getEnabled)
+                .containsExactly(expected.getEmail(),
+                        expected.getPhoneNumber(),
+                        expected.getEnabled());
 
         assertThat(passwordEncoder.matches(expected.getPassword(), actual.getPassword())).isTrue();
 
         assertThat(actual.getPatient()).isNotNull();
         assertThat(actual.getPatient())
-                .extracting(PatientDetails::getFirstName, PatientDetails::getLastName, PatientDetails::getPhoneNumber)
-                .contains(expectedPatientDetails.getFirstName(), expectedPatientDetails.getLastName(), expectedPatientDetails.getPhoneNumber());
+                .extracting(PatientDetails::getFirstName,
+                        PatientDetails::getLastName,
+                        PatientDetails::getPhoneNumber)
+                .contains(expectedPatientDetails.getFirstName(),
+                        expectedPatientDetails.getLastName(),
+                        expectedPatientDetails.getPhoneNumber());
 
     }
 
