@@ -22,7 +22,7 @@ import static com.mtiteiu.clinic.TestUtils.createUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -53,7 +53,7 @@ class UserControllerTest {
     void getUser() {
         //given
         User user = createDefaultUser();
-        when(userService.getUser(anyLong())).thenReturn(user);
+        when(userService.getUserById(anyLong())).thenReturn(user);
 
         //when
         ResponseEntity<User> response = userController.getUser(1L);
@@ -92,5 +92,17 @@ class UserControllerTest {
         //then
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(updatedUser, response.getBody());
+    }
+
+    @Test
+    void deleteUser_shouldDeleter() {
+        // When
+        ResponseEntity<String> response = userController.deleteUser(1L);
+
+        // Then
+        verify(userService, times(1)).deleteUserById(1L);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertEquals("User with id 1 deleted successfully!", response.getBody());
+
     }
 }

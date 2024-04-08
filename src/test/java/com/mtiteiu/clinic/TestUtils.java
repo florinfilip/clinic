@@ -28,6 +28,8 @@ public class TestUtils {
                 EMAIL,
                 PHONE_NUMBER,
                 PatientDetails.builder()
+                        .firstName(FIRST_NAME)
+                        .lastName(LAST_NAME)
                         .phoneNumber(PHONE_NUMBER)
                         .build());
     }

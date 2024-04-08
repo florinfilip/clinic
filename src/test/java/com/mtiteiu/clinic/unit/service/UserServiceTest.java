@@ -87,7 +87,7 @@ public class UserServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(defaultUser));
 
         //When
-        var result = userService.getUser(1L);
+        var result = userService.getUserById(1L);
 
         //then
         assertThat(result).isEqualTo(defaultUser);
@@ -99,7 +99,7 @@ public class UserServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //When/Then
-        Exception ex = assertThrows(NotFoundException.class, () -> userService.getUser(1L));
+        Exception ex = assertThrows(NotFoundException.class, () -> userService.getUserById(1L));
         assertThat(ex).hasMessage("User with id 1 not found!");
     }
 
@@ -275,5 +275,28 @@ public class UserServiceTest {
         //when/then
         Exception ex = assertThrows(NotFoundException.class, () -> userService.updateUser(1L, new User()));
         assertThat(ex).hasMessage("User with id 1 not found!");
+    }
+
+    @Test
+    void testDeleteUserById_Success() {
+        // Given
+        Long userId = 1L;
+
+        // When
+        userService.deleteUserById(userId);
+
+        // Then
+        verify(userRepository, times(1)).deleteById(userId);
+    }
+
+    @Test
+    void testDeleteUserById_Failure() {
+        // Given
+        Long userId = 1L;
+        doThrow(new RuntimeException("Database remove operation failed")).when(userRepository).deleteById(userId);
+
+        // When/Then
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.deleteUserById(userId));
+        assertThat(exception).hasMessage(String.format("Database remove operation failed for user %s", userId));
     }
 }

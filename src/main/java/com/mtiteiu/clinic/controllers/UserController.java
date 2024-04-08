@@ -32,12 +32,18 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
-        return ResponseEntity.ok().body(userService.getUser(id));
+        return ResponseEntity.ok().body(userService.getUserById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(id, user));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        userService.deleteUserById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(String.format("User with id %s deleted successfully!", id));
     }
 
 }

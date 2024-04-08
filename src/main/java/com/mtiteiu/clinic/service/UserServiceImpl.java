@@ -1,10 +1,10 @@
 package com.mtiteiu.clinic.service;
 
-import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.dao.UserRegistrationRequest;
+import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
-import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.PatientRepository;
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUser(Long id) {
+    public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %s not found!", id)));
     }
@@ -97,5 +97,15 @@ public class UserServiceImpl implements UserService {
         updatedUser.setEmail(user.getEmail());
         log.info("User with id {} updated successfully!", id);
         return userRepository.save(updatedUser);
+    }
+
+    @Override
+    public void deleteUserById(Long id) {
+        try {
+            userRepository.deleteById(id);
+        } catch (Exception ex) {
+            log.error("Application failed to delete user with id {}", id);
+            throw new RuntimeException(String.format("Database remove operation failed for user %s", id));
+        }
     }
 }
