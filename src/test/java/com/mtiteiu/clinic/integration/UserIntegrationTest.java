@@ -1,7 +1,7 @@
 package com.mtiteiu.clinic.integration;
 
 import com.mtiteiu.clinic.controllers.UserController;
-import com.mtiteiu.clinic.dao.UserRegistrationRequest;
+import com.mtiteiu.clinic.dao.UserDTO;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
@@ -16,28 +16,34 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.Set;
+import java.util.List;
 
 import static com.mtiteiu.clinic.Constants.*;
+import static com.mtiteiu.clinic.TestUtils.assertResponseNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
+@Sql(scripts = {"classpath:insert-user.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 public class UserIntegrationTest {
 
     @Autowired
@@ -55,6 +61,8 @@ public class UserIntegrationTest {
     @LocalServerPort
     int port;
 
+    public final String URL = "http://localhost:%s/users/%s";
+
     @MockBean
     JwtUtils jwtUtils;
     @Container
@@ -69,64 +77,121 @@ public class UserIntegrationTest {
 
     @Test
     void createUser() {
-
-        //given
-
-        UserRegistrationRequest body = UserRegistrationRequest.builder()
-                .firstName(FIRST_NAME)
-                .lastName(LAST_NAME)
+        //Given
+        UserDTO body = UserDTO.builder()
+                .firstName("John")
+                .lastName("Doe")
                 .password(PASSWORD)
-                .phoneNumber(PHONE_NUMBER)
-                .email(EMAIL)
+                .phoneNumber("0123123123")
+                .email("email@test.com")
                 .build();
 
-        PatientDetails expectedPatientDetails = PatientDetails.builder()
-                .firstName(FIRST_NAME)
-                .lastName(LAST_NAME)
-                .phoneNumber(PHONE_NUMBER)
-                .build();
-        User expected = User.builder()
-                .email(EMAIL)
-                .password(PASSWORD)
-                .phoneNumber(PHONE_NUMBER)
-                .enabled(true)
-                .patient(expectedPatientDetails)
-                .roles(Set.of(new Role("USER"))).
-                build();
+        //When
+        ResponseEntity<User> response = restTemplate.postForEntity(String.format(URL, port, "/add"), body, User.class);
 
-        //when
-        ResponseEntity<User> response = restTemplate.postForEntity("http://localhost:" + port + "/users/add", body, User.class);
-
-        //then
+        //Then
         assertEquals(CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
+        assertThat(response.getBody())
+                .extracting(
+                        User::getEmail,
+                        User::getEnabled,
+                        User::getPhoneNumber)
+                .containsExactly("email@test.com", true, "0123123123");
 
-        var optionalUser = userRepository.findUserByEmail(response.getBody().getEmail());
+        var roles = response.getBody().getRoles().stream()
+                .map(Role::getName)
+                .toList();
 
-        assertThat(optionalUser.isPresent()).isTrue();
+        assertThat(roles).containsExactly("USER");
+    }
 
-        var actual = optionalUser.get();
+    @Test
+    void retrieveUser() {
+        //When
+        ResponseEntity<User> response = restTemplate.getForEntity(String.format(URL, port, 2L), User.class);
+
+        //Then
+        assertNotNull(response.getBody());
+
+        var actual = response.getBody();
 
         assertThat(actual)
-                .extracting(User::getEmail,
+                .extracting(
+                        User::getEmail,
                         User::getPhoneNumber,
                         User::getEnabled)
-                .containsExactly(expected.getEmail(),
-                        expected.getPhoneNumber(),
-                        expected.getEnabled());
+                .containsExactly(
+                        "test2@email.com",
+                        "0712312323",
+                        true);
 
-        assertThat(passwordEncoder.matches(expected.getPassword(), actual.getPassword())).isTrue();
+        assertResponseNotNull(response);
 
         assertThat(actual.getPatient()).isNotNull();
         assertThat(actual.getPatient())
-                .extracting(PatientDetails::getFirstName,
+                .extracting(
+                        PatientDetails::getFirstName,
                         PatientDetails::getLastName,
                         PatientDetails::getPhoneNumber)
-                .contains(expectedPatientDetails.getFirstName(),
-                        expectedPatientDetails.getLastName(),
-                        expectedPatientDetails.getPhoneNumber());
+                .contains(
+                        "Popescu",
+                        "Ion",
+                        "0712312323");
 
     }
+
+    @Test
+    void retrieveAllUsers() {
+        //When
+        var response = restTemplate.exchange(
+                String.format("http://localhost:%s/users", port),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<User>>() {
+                });
+        //Then
+        assertNotNull(response.getBody());
+        assertTrue(response.getStatusCode().is2xxSuccessful());
+    }
+
+    @Test
+    void updateUser() {
+        //Given
+        var updateDetails = User.builder()
+                .email(UPDATED_EMAIL)
+                .password(UPDATED_PASSWORD)
+                .phoneNumber(UPDATED_PHONE_NO)
+                .build();
+
+        HttpEntity<User> requestEntity = new HttpEntity<>(updateDetails, new HttpHeaders());
+        //When
+        var response = restTemplate.exchange(
+                String.format(URL, port, 1L),
+                HttpMethod.PUT,
+                requestEntity,
+                User.class);
+
+        //Then
+
+        assertNotNull(response.getBody());
+        assertTrue(response.getStatusCode().is2xxSuccessful());
+        var user = response.getBody();
+        assertThat(user)
+                .extracting(User::getEmail, User::getPhoneNumber)
+                .containsExactly(UPDATED_EMAIL, UPDATED_PHONE_NO);
+        assertTrue(passwordEncoder.matches(UPDATED_PASSWORD, user.getPassword()));
+    }
+
+    @Test
+    void deleteUser() {
+        //When
+        restTemplate.delete(String.format(URL, port, 1L));
+
+        //Then
+        assertEquals(4, userRepository.findAll().size());
+    }
+
 
     @DynamicPropertySource
     static void props(DynamicPropertyRegistry registry) {

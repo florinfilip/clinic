@@ -2,7 +2,8 @@ package com.mtiteiu.clinic.unit.controllers;
 
 import com.mtiteiu.clinic.TestUtils;
 import com.mtiteiu.clinic.controllers.UserController;
-import com.mtiteiu.clinic.dao.UserRegistrationRequest;
+import com.mtiteiu.clinic.dao.UserDTO;
+import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.service.UserService;
@@ -20,6 +21,7 @@ import java.util.List;
 import static com.mtiteiu.clinic.TestUtils.createDefaultUser;
 import static com.mtiteiu.clinic.TestUtils.createUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -66,7 +68,7 @@ class UserControllerTest {
     @Test
     void testCreateUser() {
         //given
-        UserRegistrationRequest userRequest = TestUtils.createDefaultRegistrationRequest();
+        UserDTO userRequest = TestUtils.createDefaultRegistrationRequest();
         User newUser = createDefaultUser();
 
         //when
@@ -95,7 +97,10 @@ class UserControllerTest {
     }
 
     @Test
-    void deleteUser_shouldDeleter() {
+    void deleteUser_shouldDelete() {
+        //Given
+        when(userService.deleteUserById(1L)).thenReturn("User with id 1 deleted successfully!");
+
         // When
         ResponseEntity<String> response = userController.deleteUser(1L);
 
@@ -103,6 +108,14 @@ class UserControllerTest {
         verify(userService, times(1)).deleteUserById(1L);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertEquals("User with id 1 deleted successfully!", response.getBody());
+    }
 
+    @Test
+    void deleteUser_shouldThrow() {
+        //Given
+        when(userService.deleteUserById(1L)).thenThrow(NotFoundException.class);
+
+        // When
+        assertThrows(NotFoundException.class, () -> userController.deleteUser(1L));
     }
 }

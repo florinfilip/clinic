@@ -1,6 +1,6 @@
 package com.mtiteiu.clinic.controllers;
 
-import com.mtiteiu.clinic.dao.UserRegistrationRequest;
+import com.mtiteiu.clinic.dao.UserDTO;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class UserController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<User> createUser(@RequestBody UserRegistrationRequest user) {
+    public ResponseEntity<User> createUser(@RequestBody UserDTO user) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(user));
     }
 
@@ -42,8 +42,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        userService.deleteUserById(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(String.format("User with id %s deleted successfully!", id));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(userService.deleteUserById(id));
     }
 
 }

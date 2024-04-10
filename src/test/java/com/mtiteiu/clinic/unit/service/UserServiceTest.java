@@ -1,6 +1,6 @@
 package com.mtiteiu.clinic.unit.service;
 
-import com.mtiteiu.clinic.dao.UserRegistrationRequest;
+import com.mtiteiu.clinic.dao.UserDTO;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
@@ -56,7 +56,7 @@ public class UserServiceTest {
 
     User defaultUser = createDefaultUser();
 
-    UserRegistrationRequest registrationRequest = createDefaultRegistrationRequest();
+    UserDTO registrationRequest = createDefaultRegistrationRequest();
 
     @Test
     void getUsers() {
@@ -280,23 +280,22 @@ public class UserServiceTest {
     @Test
     void testDeleteUserById_Success() {
         // Given
-        Long userId = 1L;
+        when(userRepository.existsById(1L)).thenReturn(true);
 
         // When
-        userService.deleteUserById(userId);
+        userService.deleteUserById(1L);
 
         // Then
-        verify(userRepository, times(1)).deleteById(userId);
+        verify(userRepository, times(1)).deleteById(1L);
     }
 
     @Test
     void testDeleteUserById_Failure() {
         // Given
-        Long userId = 1L;
-        doThrow(new RuntimeException("Database remove operation failed")).when(userRepository).deleteById(userId);
+        when(userRepository.existsById(1L)).thenReturn(false);
 
         // When/Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.deleteUserById(userId));
-        assertThat(exception).hasMessage(String.format("Database remove operation failed for user %s", userId));
+        Exception exception = assertThrows(NotFoundException.class, () -> userService.deleteUserById(1L));
+        assertThat(exception).hasMessage("User with id 1 does not exist!");
     }
 }

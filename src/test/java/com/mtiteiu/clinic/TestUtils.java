@@ -1,15 +1,21 @@
 package com.mtiteiu.clinic;
 
-import com.mtiteiu.clinic.dao.UserRegistrationRequest;
+import com.mtiteiu.clinic.dao.UserDTO;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
+import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.AbstractBooleanAssert;
+import org.assertj.core.api.AssertionsForInterfaceTypes;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import static com.mtiteiu.clinic.Constants.*;
 
+@Slf4j
 public class TestUtils {
 
     public static User createUser(String email, String password, String phoneNumber, PatientDetails patientDetails) {
@@ -38,8 +44,8 @@ public class TestUtils {
         return List.of(createDefaultUser(), createDefaultUser(), createDefaultUser());
     }
 
-    public static UserRegistrationRequest createRegistrationRequest(String username, String lastName, String password, String phoneNumber, String email) {
-        return UserRegistrationRequest.builder()
+    public static UserDTO createRegistrationRequest(String username, String lastName, String password, String phoneNumber, String email) {
+        return UserDTO.builder()
                 .firstName(username)
                 .lastName(lastName)
                 .password(password)
@@ -48,7 +54,7 @@ public class TestUtils {
                 .build();
     }
 
-    public static UserRegistrationRequest createDefaultRegistrationRequest() {
+    public static UserDTO createDefaultRegistrationRequest() {
         return createRegistrationRequest(
                 "firstName",
                 "lastName",
@@ -56,4 +62,19 @@ public class TestUtils {
                 "0762537817",
                 "test@test.com");
     }
-}
+
+    public static <T> boolean responseNotNull(ResponseEntity<T> response) {
+        if (!response.getStatusCode().is2xxSuccessful() && response.getBody() == null) {
+            log.error("Error response status or null body!");
+            return false;
+        }
+        return true;
+    }
+
+    public static <T> AbstractBooleanAssert<?> assertResponseNotNull(ResponseEntity<T> actual) {
+
+        Predicate<ResponseEntity<T>> predicate = (response) -> response.getStatusCode().is2xxSuccessful() && response.getBody() != null;
+
+        return AssertionsForInterfaceTypes.assertThat(predicate.test(actual));
+    }
+    }

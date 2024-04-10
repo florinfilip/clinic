@@ -7,7 +7,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @Builder
-public class UserRegistrationRequest {
+public class UserDTO {
 
     String firstName;
     String lastName;

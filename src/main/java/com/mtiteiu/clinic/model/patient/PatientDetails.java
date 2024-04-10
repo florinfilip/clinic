@@ -5,27 +5,26 @@ import com.mtiteiu.clinic.validation.ValidCNP;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "patient")
+@Getter
+@Setter
+@Table(name = "patients")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class PatientDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
-    @PrimaryKeyJoinColumn
+//    @PrimaryKeyJoinColumn
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @ValidCNP
@@ -59,7 +58,7 @@ public class PatientDetails {
 
     private Religion religion;
 
-    @OneToMany
+    @OneToMany(mappedBy = "patientDetails")
     private List<Allergy> allergies;
 
     @Entity
@@ -72,6 +71,10 @@ public class PatientDetails {
         private Long id;
 
         String name;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "patient_id")
+        PatientDetails patientDetails;
 
     }
 

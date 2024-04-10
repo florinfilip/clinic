@@ -1,6 +1,6 @@
 package com.mtiteiu.clinic.service;
 
-import com.mtiteiu.clinic.dao.UserRegistrationRequest;
+import com.mtiteiu.clinic.dao.UserDTO;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(UserRegistrationRequest request) {
+    public User createUser(UserDTO request) {
 
         var defaultRole = roleRepository.findByName("USER").orElseGet(() -> new Role("USER"));
 
@@ -77,6 +77,8 @@ public class UserServiceImpl implements UserService {
                 .enabled(true)
                 .roles(Set.of(defaultRole)).build();
 
+        patientDetails.setUser(newUser);
+
         try {
             userRepository.save(newUser);
             log.info("User {} created successfully!", newUser.getEmail());
@@ -88,24 +90,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(Long id, User user) {
+    public User updateUser(Long id, User updateDetails) {
         var updatedUser = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %s not found!", id)));
 
-        updatedUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        updatedUser.setPhoneNumber(user.getPhoneNumber());
-        updatedUser.setEmail(user.getEmail());
+        updatedUser.setPassword(updateDetails.getPassword() != null ? bCryptPasswordEncoder.encode(updateDetails.getPassword()) : updatedUser.getPassword());
+        updatedUser.setPhoneNumber(updateDetails.getPhoneNumber());
+        updatedUser.setEmail(updateDetails.getEmail());
         log.info("User with id {} updated successfully!", id);
         return userRepository.save(updatedUser);
     }
 
     @Override
-    public void deleteUserById(Long id) {
-        try {
+    public String deleteUserById(Long id) {
+        if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
-        } catch (Exception ex) {
-            log.error("Application failed to delete user with id {}", id);
-            throw new RuntimeException(String.format("Database remove operation failed for user %s", id));
+            return String.format("User with id %s deleted successfully!", id);
         }
+        throw new NotFoundException(String.format("User with id %s does not exist!", id));
     }
 }
