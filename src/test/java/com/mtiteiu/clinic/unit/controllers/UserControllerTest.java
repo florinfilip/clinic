@@ -2,7 +2,7 @@ package com.mtiteiu.clinic.unit.controllers;
 
 import com.mtiteiu.clinic.TestUtils;
 import com.mtiteiu.clinic.controllers.UserController;
-import com.mtiteiu.clinic.dao.UserDTO;
+import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.User;

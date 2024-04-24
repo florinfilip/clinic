@@ -1,6 +1,6 @@
 package com.mtiteiu.clinic.controllers;
 
-import com.mtiteiu.clinic.dao.UserDTO;
+import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-
     private final UserService userService;
-
 
     @GetMapping
     public ResponseEntity<List<User>> getUsers() {

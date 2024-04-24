@@ -1,6 +1,6 @@
 package com.mtiteiu.clinic.service;
 
-import com.mtiteiu.clinic.dao.UserDTO;
+import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.model.user.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 

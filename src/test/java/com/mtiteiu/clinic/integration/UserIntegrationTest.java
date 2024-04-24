@@ -1,7 +1,7 @@
 package com.mtiteiu.clinic.integration;
 
 import com.mtiteiu.clinic.controllers.UserController;
-import com.mtiteiu.clinic.dao.UserDTO;
+import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;

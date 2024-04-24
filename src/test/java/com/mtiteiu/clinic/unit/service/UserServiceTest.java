@@ -1,6 +1,6 @@
 package com.mtiteiu.clinic.unit.service;
 
-import com.mtiteiu.clinic.dao.UserDTO;
+import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
 import com.mtiteiu.clinic.model.patient.PatientDetails;

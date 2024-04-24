@@ -1,4 +1,4 @@
-package com.mtiteiu.clinic.dao;
+package com.mtiteiu.clinic.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
