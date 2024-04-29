@@ -1,6 +1,7 @@
 package com.mtiteiu.clinic.service;
 
 import com.mtiteiu.clinic.dto.UserDTO;
+import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
@@ -11,6 +12,7 @@ import com.mtiteiu.clinic.repository.PatientRepository;
 import com.mtiteiu.clinic.repository.RoleRepository;
 import com.mtiteiu.clinic.repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.validation.ValidationException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -60,7 +63,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(UserDTO request) {
 
+        checkUniqueEmail(request.getEmail());
+
         var defaultRole = roleRepository.findByName("USER").orElseGet(() -> new Role("USER"));
+
+        checkValidPassword(request);
 
         var patientDetails = patientRepository.findPatientByPhoneNumber(request.getPhoneNumber())
                 .orElseGet(() -> PatientDetails.builder()
@@ -85,7 +92,13 @@ public class UserServiceImpl implements UserService {
             return newUser;
         } catch (Exception ex) {
             log.error("Error while trying to save user: {} \n {}", newUser.getEmail(), ex.getMessage());
-            throw new NotFoundException(String.format("Error while trying to save user %s: %s", request.getEmail(), ex.getMessage()));
+            throw new DatabaseActionException(String.format("Error while trying to save user %s: %s", request.getEmail(), ex.getMessage()));
+        }
+    }
+
+    private void checkUniqueEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new ValidationException(String.format("Email %s is already registered!", email));
         }
     }
 
@@ -108,5 +121,11 @@ public class UserServiceImpl implements UserService {
             return String.format("User with id %s deleted successfully!", id);
         }
         throw new NotFoundException(String.format("User with id %s does not exist!", id));
+    }
+
+    private void checkValidPassword(UserDTO user) {
+        if (!Objects.equals(user.getPassword(), user.getRepeatPassword())) {
+            throw new ValidationException("Passwords do not match!");
+        }
     }
 }

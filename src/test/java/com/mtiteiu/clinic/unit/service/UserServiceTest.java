@@ -1,6 +1,7 @@
 package com.mtiteiu.clinic.unit.service;
 
 import com.mtiteiu.clinic.dto.UserDTO;
+import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
@@ -10,6 +11,7 @@ import com.mtiteiu.clinic.repository.PatientRepository;
 import com.mtiteiu.clinic.repository.RoleRepository;
 import com.mtiteiu.clinic.repository.UserRepository;
 import com.mtiteiu.clinic.service.UserServiceImpl;
+import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -25,8 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mtiteiu.clinic.Constants.EMAIL;
-import static com.mtiteiu.clinic.Constants.ENCODED_PASSWORD;
+import static com.mtiteiu.clinic.Constants.*;
 import static com.mtiteiu.clinic.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -198,6 +199,29 @@ public class UserServiceTest {
     }
 
     @Test
+    void voidCreateUser_passNotMatching_shouldThrow() {
+        //given
+
+        var registrationRequest = UserDTO.builder()
+                .email(EMAIL)
+                .password(PASSWORD)
+                .repeatPassword("repeatPassword")
+                .lastName("Test")
+                .firstName("Test")
+                .build();
+        Role defaultUserRole = new Role("USER");
+
+        when(roleRepository.findByName(anyString())).thenReturn(Optional.of(defaultUserRole));
+
+
+        //when/then
+
+        Exception ex = assertThrows(ValidationException.class, () -> userService.createUser(registrationRequest));
+
+        assertThat(ex.getMessage()).isEqualTo("Passwords do not match!");
+    }
+
+    @Test
     void createUser_whenDefaultRoleNotFound_shouldCreateDefault() {
         //given
         when(roleRepository.findByName(anyString())).thenReturn(Optional.empty());
@@ -228,7 +252,7 @@ public class UserServiceTest {
         doThrow(new RuntimeException()).when(userRepository).save(any(User.class));
         //when
 
-        Exception ex = assertThrows(NotFoundException.class, () -> userService.createUser(registrationRequest));
+        Exception ex = assertThrows(DatabaseActionException.class, () -> userService.createUser(registrationRequest));
 
         //then
         assertThat(ex.getMessage()).isEqualTo("Error while trying to save user test@test.com: null");

@@ -22,9 +22,9 @@ public class PatientDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(mappedBy = "patient")
 //    @PrimaryKeyJoinColumn
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+//    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @ValidCNP
@@ -41,7 +41,7 @@ public class PatientDetails {
 
     @NotNull
     @Column(unique = true)
-    @Min(value = 10, message = "Please check your phone number")
+    @Min(value = 10, message = "Please check your phone number!")
     private String phoneNumber;
 
     private Integer age;

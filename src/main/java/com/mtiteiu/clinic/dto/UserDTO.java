@@ -8,11 +8,10 @@ import lombok.Data;
 @Data
 @Builder
 public class UserDTO {
-
+    String email;
+    String password;
+    String repeatPassword;
     String firstName;
     String lastName;
-    String password;
-    String email;
     String phoneNumber;
-
 }

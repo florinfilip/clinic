@@ -82,6 +82,7 @@ public class UserIntegrationTest {
                 .firstName("John")
                 .lastName("Doe")
                 .password(PASSWORD)
+                .repeatPassword(PASSWORD)
                 .phoneNumber("0123123123")
                 .email("email@test.com")
                 .build();
@@ -189,7 +190,7 @@ public class UserIntegrationTest {
         restTemplate.delete(String.format(URL, port, 1L));
 
         //Then
-        assertEquals(4, userRepository.findAll().size());
+        assertEquals(3, userRepository.findAll().size());
     }
 
 

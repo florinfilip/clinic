@@ -44,11 +44,12 @@ public class TestUtils {
         return List.of(createDefaultUser(), createDefaultUser(), createDefaultUser());
     }
 
-    public static UserDTO createRegistrationRequest(String username, String lastName, String password, String phoneNumber, String email) {
+    public static UserDTO createRegistrationRequest(String username, String lastName, String password, String rPassword, String phoneNumber, String email) {
         return UserDTO.builder()
                 .firstName(username)
                 .lastName(lastName)
                 .password(password)
+                .repeatPassword(rPassword)
                 .phoneNumber(phoneNumber)
                 .email(email)
                 .build();
@@ -58,6 +59,7 @@ public class TestUtils {
         return createRegistrationRequest(
                 "firstName",
                 "lastName",
+                "password",
                 "password",
                 "0762537817",
                 "test@test.com");
