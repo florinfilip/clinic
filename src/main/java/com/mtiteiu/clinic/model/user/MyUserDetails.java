@@ -1,6 +1,5 @@
 package com.mtiteiu.clinic.model.user;
 
-import com.mtiteiu.clinic.model.patient.PatientDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -48,9 +47,5 @@ public class MyUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return user.getEnabled();
-    }
-
-    public PatientDetails getPatientDetails() {
-        return user.getPatient();
     }
 }

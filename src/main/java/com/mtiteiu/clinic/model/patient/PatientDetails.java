@@ -1,52 +1,33 @@
 package com.mtiteiu.clinic.model.patient;
 
-import com.mtiteiu.clinic.model.user.User;
-import com.mtiteiu.clinic.validation.ValidCNP;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.ValidationException;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "patients")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PatientDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "patient")
-//    @PrimaryKeyJoinColumn
-//    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
-
-    @ValidCNP
-    @Column(unique = true)
-    private String cnp;
-
-    private LocalDateTime dateOfBirth;
-
-    @NotNull
-    private String firstName;
-
-    @NotNull
-    private String lastName;
-
-    @NotNull
-    @Column(unique = true)
-    @Min(value = 10, message = "Please check your phone number!")
-    private String phoneNumber;
-
-    private Integer age;
+    @OneToOne(mappedBy = "patientDetails")
+    @JsonIgnoreProperties("patientDetails")
+    private Patient patient;
 
     private Gender gender;
+
+    private Integer age;
 
     private Race race;
 
@@ -58,24 +39,15 @@ public class PatientDetails {
 
     private Religion religion;
 
-    @OneToMany(mappedBy = "patientDetails")
-    private List<Allergy> allergies;
+    @ElementCollection
+    @CollectionTable(name = "allergies", joinColumns = @JoinColumn(name = "patient_id"))
+    private List<String> allergies;
 
-    @Entity
-    @Data
-    @Table(name = "allergies")
-    public static class Allergy {
-
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
-
-        String name;
-
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "patient_id")
-        PatientDetails patientDetails;
-
+    public Integer getAge(LocalDate birthDate) {
+        var dateOfBirth = patient.getDateOfBirth();
+        if (dateOfBirth == null) {
+            throw new ValidationException("Date of birth is null for patient with id %s!");
+        }
+        return Period.between(dateOfBirth, LocalDate.now()).getYears();
     }
-
 }

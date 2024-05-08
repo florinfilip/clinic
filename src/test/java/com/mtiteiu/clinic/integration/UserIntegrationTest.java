@@ -2,7 +2,7 @@ package com.mtiteiu.clinic.integration;
 
 import com.mtiteiu.clinic.controllers.UserController;
 import com.mtiteiu.clinic.dto.UserDTO;
-import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.UserRepository;
@@ -79,6 +79,7 @@ public class UserIntegrationTest {
     void createUser() {
         //Given
         UserDTO body = UserDTO.builder()
+                .cnp(CNP)
                 .firstName("John")
                 .lastName("Doe")
                 .password(PASSWORD)
@@ -132,9 +133,9 @@ public class UserIntegrationTest {
         assertThat(actual.getPatient()).isNotNull();
         assertThat(actual.getPatient())
                 .extracting(
-                        PatientDetails::getFirstName,
-                        PatientDetails::getLastName,
-                        PatientDetails::getPhoneNumber)
+                        Patient::getFirstName,
+                        Patient::getLastName,
+                        Patient::getPhoneNumber)
                 .contains(
                         "Popescu",
                         "Ion",
