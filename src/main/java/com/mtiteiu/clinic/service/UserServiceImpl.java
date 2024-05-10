@@ -4,7 +4,7 @@ import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
-import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
@@ -70,9 +70,11 @@ public class UserServiceImpl implements UserService {
         checkValidPassword(request);
 
         var patientDetails = patientRepository.findPatientByPhoneNumber(request.getPhoneNumber())
-                .orElseGet(() -> PatientDetails.builder()
+                .orElseGet(() -> Patient.builder()
                         .firstName(request.getFirstName())
                         .lastName(request.getLastName())
+                        .cnp(request.getCnp())
+                        .dateOfBirth(request.getDateOfBirth())
                         .phoneNumber(request.getPhoneNumber())
                         .build());
 
@@ -97,7 +99,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkUniqueEmail(String email) {
-        if (userRepository.existsByEmail(email)) {
+        if (Boolean.TRUE.equals(userRepository.existsByEmail(email))) {
             throw new ValidationException(String.format("Email %s is already registered!", email));
         }
     }

@@ -1,12 +1,12 @@
 -- Create pacients
-INSERT INTO patients (cnp, first_name, last_name, phone_number, age)
-VALUES ('1990412080042', 'firstName', 'lastName', '0742341231', 20);
+INSERT INTO patients (cnp, DATE_OF_BIRTH, first_name, last_name, phone_number)
+VALUES ('1981009416023', TO_DATE('1999-06-06', 'YYYY-MM-DD'), 'Harry', 'Potter', '0742341231');
 
-INSERT INTO patients (cnp, first_name, last_name, phone_number, age)
-VALUES ('1990542080042', 'Popescu', 'Ion', '0712312323', 20);
+INSERT INTO patients (cnp, DATE_OF_BIRTH, first_name, last_name, phone_number)
+VALUES ('1981009226021', TO_DATE('1999-07-06', 'YYYY-MM-DD'), 'Popescu', 'Ion', '0712312323');
 
-INSERT INTO patients (cnp, first_name, last_name, phone_number, age)
-VALUES ('1990412180042', 'John', 'Doe', '0123123231', 20);
+INSERT INTO patients (cnp, DATE_OF_BIRTH, first_name, last_name, phone_number)
+VALUES ('1990412180042', TO_DATE('1999-02-06', 'YYYY-MM-DD'), 'John', 'Doe', '0123123231');
 
 -- Create Users
 

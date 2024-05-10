@@ -4,7 +4,7 @@ import com.mtiteiu.clinic.TestUtils;
 import com.mtiteiu.clinic.controllers.UserController;
 import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.exception.NotFoundException;
-import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -39,8 +39,8 @@ class UserControllerTest {
     void testGetUsers() {
         //given
         List<User> userList = Arrays.asList(
-                createUser("email@email.com", "password", "0741625364", new PatientDetails()),
-                createUser("test@test.com", "password", "0782634646", new PatientDetails()));
+                createUser("email@email.com", "password", "0741625364", new Patient()),
+                createUser("test@test.com", "password", "0782634646", new Patient()));
         when(userService.getUsers()).thenReturn(userList);
 
         //when

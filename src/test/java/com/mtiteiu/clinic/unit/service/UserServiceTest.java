@@ -4,7 +4,7 @@ import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
-import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.PatientRepository;
@@ -138,14 +138,14 @@ public class UserServiceTest {
 
         when(roleRepository.findByName(anyString())).thenReturn(Optional.of(defaultUserRole));
 
-        PatientDetails patientDetails = PatientDetails.builder()
+        Patient patient = Patient.builder()
                 .firstName("firstName")
                 .lastName("lastName")
                 .phoneNumber(registrationRequest.getPhoneNumber())
                 .build();
 
         when(patientRepository.findPatientByPhoneNumber(anyString()))
-                .thenReturn(Optional.ofNullable(patientDetails));
+                .thenReturn(Optional.ofNullable(patient));
 
         //when/then
         userService.createUser(registrationRequest);
@@ -160,7 +160,7 @@ public class UserServiceTest {
         assertThat(createdUser.getRoles()).containsExactly(defaultUserRole);
         assertThat(createdUser.getPatient()).isNotNull();
         assertThat(createdUser.getPatient())
-                .extracting(PatientDetails::getFirstName, PatientDetails::getLastName)
+                .extracting(Patient::getFirstName, Patient::getLastName)
                 .containsExactly("firstName", "lastName");
 
         verify(passwordEncoder).encode("password");
@@ -191,7 +191,7 @@ public class UserServiceTest {
         assertThat(createdUser.getRoles()).containsExactly(defaultUserRole);
         assertThat(createdUser.getPatient()).isNotNull();
         assertThat(createdUser.getPatient())
-                .extracting(PatientDetails::getFirstName, PatientDetails::getLastName)
+                .extracting(Patient::getFirstName, Patient::getLastName)
                 .containsExactly("firstName", "lastName");
 
         verify(passwordEncoder).encode("password");
@@ -266,7 +266,7 @@ public class UserServiceTest {
                 "test@gmail.com",
                 "testPassword",
                 "04567342132",
-                PatientDetails.builder().build());
+                Patient.builder().build());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(defaultUser));
         when(passwordEncoder.encode(anyString())).thenReturn(ENCODED_PASSWORD);

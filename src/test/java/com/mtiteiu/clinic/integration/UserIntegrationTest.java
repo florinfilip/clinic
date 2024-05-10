@@ -2,7 +2,7 @@ package com.mtiteiu.clinic.integration;
 
 import com.mtiteiu.clinic.controllers.UserController;
 import com.mtiteiu.clinic.dto.UserDTO;
-import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.UserRepository;
@@ -31,6 +31,7 @@ import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.mtiteiu.clinic.Constants.*;
@@ -44,7 +45,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
 @Sql(scripts = {"classpath:insert-user.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-public class UserIntegrationTest {
+class UserIntegrationTest {
 
     @Autowired
     UserRepository userRepository;
@@ -79,10 +80,12 @@ public class UserIntegrationTest {
     void createUser() {
         //Given
         UserDTO body = UserDTO.builder()
+                .cnp(CNP)
                 .firstName("John")
                 .lastName("Doe")
                 .password(PASSWORD)
                 .repeatPassword(PASSWORD)
+                .dateOfBirth(LocalDate.of(1967, 4, 12))
                 .phoneNumber("0123123123")
                 .email("email@test.com")
                 .build();
@@ -93,7 +96,23 @@ public class UserIntegrationTest {
         //Then
         assertEquals(CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertThat(response.getBody())
+        var responseBody = response.getBody();
+        assertNotNull(responseBody.getPatient());
+        assertThat(responseBody.getPatient())
+                .extracting(
+                        Patient::getCnp,
+                        Patient::getPhoneNumber,
+                        Patient::getFirstName,
+                        Patient::getLastName,
+                        Patient::getDateOfBirth)
+                .containsExactly(
+                        CNP,
+                        "0123123123",
+                        "John",
+                        "Doe",
+                        LocalDate.of(1967, 4, 12)
+                );
+        assertThat(responseBody)
                 .extracting(
                         User::getEmail,
                         User::getEnabled,
@@ -132,9 +151,9 @@ public class UserIntegrationTest {
         assertThat(actual.getPatient()).isNotNull();
         assertThat(actual.getPatient())
                 .extracting(
-                        PatientDetails::getFirstName,
-                        PatientDetails::getLastName,
-                        PatientDetails::getPhoneNumber)
+                        Patient::getFirstName,
+                        Patient::getLastName,
+                        Patient::getPhoneNumber)
                 .contains(
                         "Popescu",
                         "Ion",

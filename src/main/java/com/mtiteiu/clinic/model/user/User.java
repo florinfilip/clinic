@@ -1,7 +1,7 @@
 package com.mtiteiu.clinic.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.patient.Patient;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -48,9 +48,8 @@ public class User {
     private Set<Role> roles;
 
     @JsonIgnoreProperties("user")
-//    @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
-    private PatientDetails patient;
+    private Patient patient;
 
 }
