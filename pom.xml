@@ -18,8 +18,9 @@
         <jjwt.version>0.12.5</jjwt.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <ojdbc.version>19.22.0.0</ojdbc.version>
-        <junit.jupiter.version>1.19.7</junit.jupiter.version>
-        <test.container.version>1.19.7</test.container.version>
+        <junit.jupiter.version>1.19.8</junit.jupiter.version>
+        <test.container.version>1.19.8</test.container.version>
+        <apache.commons.compress>1.26.1</apache.commons.compress>
     </properties>
 
 
@@ -119,6 +120,18 @@
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${apache.commons.compress}</version>
         </dependency>
 
         <dependency>
