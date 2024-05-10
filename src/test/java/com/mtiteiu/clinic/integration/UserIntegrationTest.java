@@ -45,7 +45,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
 @Sql(scripts = {"classpath:insert-user.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-public class UserIntegrationTest {
+class UserIntegrationTest {
 
     @Autowired
     UserRepository userRepository;

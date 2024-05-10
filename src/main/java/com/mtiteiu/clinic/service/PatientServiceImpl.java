@@ -107,11 +107,4 @@ public class PatientServiceImpl implements PatientService {
         patientRepository.save(patient);
         return details;
     }
-
-    private PatientDetails updateNewPatientDetails(PatientDetails patientDetails, PatientDetails updatedDetails) {
-
-//        patientDetailsMapper.updatePatientDetails(updatedDetails, patientDetails);
-
-        return patientDetails;
-    }
 }

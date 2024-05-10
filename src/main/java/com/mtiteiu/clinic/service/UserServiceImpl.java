@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkUniqueEmail(String email) {
-        if (userRepository.existsByEmail(email)) {
+        if (Boolean.TRUE.equals(userRepository.existsByEmail(email))) {
             throw new ValidationException(String.format("Email %s is already registered!", email));
         }
     }
