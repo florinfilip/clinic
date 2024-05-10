@@ -73,6 +73,8 @@ public class UserServiceImpl implements UserService {
                 .orElseGet(() -> Patient.builder()
                         .firstName(request.getFirstName())
                         .lastName(request.getLastName())
+                        .cnp(request.getCnp())
+                        .dateOfBirth(request.getDateOfBirth())
                         .phoneNumber(request.getPhoneNumber())
                         .build());
 

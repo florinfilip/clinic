@@ -31,6 +31,7 @@ import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.mtiteiu.clinic.Constants.*;
@@ -84,6 +85,7 @@ public class UserIntegrationTest {
                 .lastName("Doe")
                 .password(PASSWORD)
                 .repeatPassword(PASSWORD)
+                .dateOfBirth(LocalDate.of(1967, 4, 12))
                 .phoneNumber("0123123123")
                 .email("email@test.com")
                 .build();
@@ -94,7 +96,23 @@ public class UserIntegrationTest {
         //Then
         assertEquals(CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertThat(response.getBody())
+        var responseBody = response.getBody();
+        assertNotNull(responseBody.getPatient());
+        assertThat(responseBody.getPatient())
+                .extracting(
+                        Patient::getCnp,
+                        Patient::getPhoneNumber,
+                        Patient::getFirstName,
+                        Patient::getLastName,
+                        Patient::getDateOfBirth)
+                .containsExactly(
+                        CNP,
+                        "0123123123",
+                        "John",
+                        "Doe",
+                        LocalDate.of(1967, 4, 12)
+                );
+        assertThat(responseBody)
                 .extracting(
                         User::getEmail,
                         User::getEnabled,
