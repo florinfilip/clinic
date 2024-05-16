@@ -1,5 +1,6 @@
 package com.mtiteiu.clinic.model;
 
+import com.mtiteiu.clinic.model.patient.Gender;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.validation.ValidCNP;
 import jakarta.persistence.*;
@@ -41,6 +42,9 @@ public class Person {
 
     @NotNull
     private String lastName;
+
+    @NotNull
+    private Gender gender;
 
     @NotNull
     @Column(unique = true)

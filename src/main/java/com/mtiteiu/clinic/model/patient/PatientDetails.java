@@ -25,8 +25,6 @@ public class PatientDetails {
     @JsonIgnoreProperties("patientDetails")
     private Patient patient;
 
-    private Gender gender;
-
     private Integer age;
 
     private Race race;
@@ -43,7 +41,7 @@ public class PatientDetails {
     @CollectionTable(name = "allergies", joinColumns = @JoinColumn(name = "patient_id"))
     private List<String> allergies;
 
-    public Integer getAge(LocalDate birthDate) {
+    public Integer getAge() {
         var dateOfBirth = patient.getDateOfBirth();
         if (dateOfBirth == null) {
             throw new ValidationException("Date of birth is null for patient with id %s!");
