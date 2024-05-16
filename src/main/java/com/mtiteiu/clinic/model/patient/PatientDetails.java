@@ -37,9 +37,23 @@ public class PatientDetails {
 
     private Religion religion;
 
+    private String professionalStatus;
+
+    private Boolean potent;
+
+    private Boolean maritalStatus;
+
     @ElementCollection
     @CollectionTable(name = "allergies", joinColumns = @JoinColumn(name = "patient_id"))
     private List<String> allergies;
+
+    @ElementCollection
+    @CollectionTable(name = "vices", joinColumns = @JoinColumn(name = "patient_id"))
+    private List<String> vices;
+
+    @ElementCollection
+    @CollectionTable(name = "chronic_conditions", joinColumns = @JoinColumn(name = "patient_id"))
+    private List<String> chronicConditions;
 
     public Integer getAge() {
         var dateOfBirth = patient.getDateOfBirth();
