@@ -1,9 +1,12 @@
 package com.mtiteiu.clinic.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.mtiteiu.clinic.model.patient.Patient;
+import com.mtiteiu.clinic.model.Person;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -49,7 +52,7 @@ public class User {
 
     @JsonIgnoreProperties("user")
     @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "patient_id", referencedColumnName = "id")
-    private Patient patient;
+    @JoinColumn(name = "person_id", referencedColumnName = "id")
+    private Person person;
 
 }

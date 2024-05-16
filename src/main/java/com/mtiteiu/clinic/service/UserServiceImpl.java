@@ -5,13 +5,14 @@ import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
 import com.mtiteiu.clinic.model.patient.Patient;
+import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.PatientRepository;
+import com.mtiteiu.clinic.repository.PersonRepository;
 import com.mtiteiu.clinic.repository.RoleRepository;
 import com.mtiteiu.clinic.repository.UserRepository;
-import jakarta.persistence.EntityManager;
 import jakarta.validation.ValidationException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -25,16 +26,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.mtiteiu.clinic.model.user.UserRoles.USER;
+
 @Data
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final PatientRepository patientRepository;
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final EntityManager entityManager;
-    private final PatientRepository patientRepository;
+    private final PersonRepository personRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
@@ -65,28 +68,29 @@ public class UserServiceImpl implements UserService {
 
         checkUniqueEmail(request.getEmail());
 
-        var defaultRole = roleRepository.findByName("USER").orElseGet(() -> new Role("USER"));
+        var defaultRole = roleRepository.findByName(USER.name()).orElseGet(() -> new Role(USER.name()));
 
         checkValidPassword(request);
 
-        var patientDetails = patientRepository.findPatientByPhoneNumber(request.getPhoneNumber())
+        Patient personDetails = patientRepository.findPatientByPhoneNumber(request.getPhoneNumber())
                 .orElseGet(() -> Patient.builder()
                         .firstName(request.getFirstName())
                         .lastName(request.getLastName())
                         .cnp(request.getCnp())
                         .dateOfBirth(request.getDateOfBirth())
                         .phoneNumber(request.getPhoneNumber())
+                        .patientDetails(new PatientDetails())
                         .build());
 
         var newUser = User.builder()
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .password(bCryptPasswordEncoder.encode(request.getPassword()))
-                .patient(patientDetails)
+                .person(personDetails)
                 .enabled(true)
                 .roles(Set.of(defaultRole)).build();
 
-        patientDetails.setUser(newUser);
+        personDetails.setUser(newUser);
 
         try {
             userRepository.save(newUser);

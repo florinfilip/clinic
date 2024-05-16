@@ -2,7 +2,7 @@ package com.mtiteiu.clinic.integration;
 
 import com.mtiteiu.clinic.controllers.UserController;
 import com.mtiteiu.clinic.dto.UserDTO;
-import com.mtiteiu.clinic.model.patient.Patient;
+import com.mtiteiu.clinic.model.Person;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.UserRepository;
@@ -97,14 +97,14 @@ class UserIntegrationTest {
         assertEquals(CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         var responseBody = response.getBody();
-        assertNotNull(responseBody.getPatient());
-        assertThat(responseBody.getPatient())
+        assertNotNull(responseBody.getPerson());
+        assertThat(responseBody.getPerson())
                 .extracting(
-                        Patient::getCnp,
-                        Patient::getPhoneNumber,
-                        Patient::getFirstName,
-                        Patient::getLastName,
-                        Patient::getDateOfBirth)
+                        Person::getCnp,
+                        Person::getPhoneNumber,
+                        Person::getFirstName,
+                        Person::getLastName,
+                        Person::getDateOfBirth)
                 .containsExactly(
                         CNP,
                         "0123123123",
@@ -148,12 +148,12 @@ class UserIntegrationTest {
 
         assertResponseNotNull(response);
 
-        assertThat(actual.getPatient()).isNotNull();
-        assertThat(actual.getPatient())
+        assertThat(actual.getPerson()).isNotNull();
+        assertThat(actual.getPerson())
                 .extracting(
-                        Patient::getFirstName,
-                        Patient::getLastName,
-                        Patient::getPhoneNumber)
+                        Person::getFirstName,
+                        Person::getLastName,
+                        Person::getPhoneNumber)
                 .contains(
                         "Popescu",
                         "Ion",

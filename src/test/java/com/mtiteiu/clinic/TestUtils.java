@@ -27,7 +27,7 @@ public class TestUtils {
                 .phoneNumber(phoneNumber)
                 .enabled(true)
                 .roles(Set.of(new Role("USER")))
-                .patient(patient)
+                .person(patient)
                 .build();
     }
 
