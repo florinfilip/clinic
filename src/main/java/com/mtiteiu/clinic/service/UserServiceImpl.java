@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static com.mtiteiu.clinic.model.user.UserRoles.USER;
+import static com.mtiteiu.clinic.util.Utils.getBirthDateFromCNP;
 
 @Data
 @Slf4j
@@ -73,11 +74,12 @@ public class UserServiceImpl implements UserService {
         checkValidPassword(request);
 
         Patient personDetails = patientRepository.findPatientByPhoneNumber(request.getPhoneNumber())
-                .orElseGet(() -> Patient.builder()
+                .orElse(Patient.builder()
                         .firstName(request.getFirstName())
                         .lastName(request.getLastName())
                         .cnp(request.getCnp())
-                        .dateOfBirth(request.getDateOfBirth())
+                        .gender(request.getGender())
+                        .dateOfBirth(getBirthDateFromCNP(request.getCnp()))
                         .phoneNumber(request.getPhoneNumber())
                         .patientDetails(new PatientDetails())
                         .build());

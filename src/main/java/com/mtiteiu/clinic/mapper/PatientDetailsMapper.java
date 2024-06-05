@@ -15,5 +15,6 @@ public interface PatientDetailsMapper {
     PatientDetailsMapper INSTANCE = Mappers.getMapper(PatientDetailsMapper.class);
 
     @Mapping(target = "id", ignore = true)
+//    @Mapping(target = "patient", ignore = true)
     void updatePatientDetails(PatientDetails source, @MappingTarget PatientDetails target);
 }

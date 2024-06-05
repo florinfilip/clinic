@@ -2,11 +2,8 @@ package com.mtiteiu.clinic.model.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.ValidationException;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 
 @Entity
@@ -22,12 +19,10 @@ public class PatientDetails {
     private Long id;
 
     @OneToOne(mappedBy = "patientDetails")
-    @JsonIgnoreProperties("patientDetails")
+    @JsonIgnoreProperties({"patientDetails", "user"})
     private Patient patient;
 
     private Integer age;
-
-    private Race race;
 
     private Double weight;
 
@@ -37,11 +32,18 @@ public class PatientDetails {
 
     private Religion religion;
 
-    private String professionalStatus;
+    private Race race;
 
-    private Boolean potent;
+    private ProfessionalStatus professionalStatus;
 
-    private Boolean maritalStatus;
+    private CivilStatus civilStatus;
+
+    private Diet diet;
+
+    private Boolean smoker;
+
+    private Boolean alcohol;
+
 
     @ElementCollection
     @CollectionTable(name = "allergies", joinColumns = @JoinColumn(name = "patient_id"))
@@ -49,17 +51,17 @@ public class PatientDetails {
 
     @ElementCollection
     @CollectionTable(name = "vices", joinColumns = @JoinColumn(name = "patient_id"))
-    private List<String> vices;
+    private List<String> conditions;
 
     @ElementCollection
     @CollectionTable(name = "chronic_conditions", joinColumns = @JoinColumn(name = "patient_id"))
     private List<String> chronicConditions;
 
-    public Integer getAge() {
-        var dateOfBirth = patient.getDateOfBirth();
-        if (dateOfBirth == null) {
-            throw new ValidationException("Date of birth is null for patient with id %s!");
-        }
-        return Period.between(dateOfBirth, LocalDate.now()).getYears();
-    }
+//    public Integer getAge() {
+//        var dateOfBirth = patient.getDateOfBirth();
+//        if (dateOfBirth == null) {
+//            throw new ValidationException("Date of birth is null for patient with id %s!");
+//        }
+//        return Period.between(dateOfBirth, LocalDate.now()).getYears();
+//    }
 }

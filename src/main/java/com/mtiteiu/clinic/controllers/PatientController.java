@@ -2,11 +2,15 @@ package com.mtiteiu.clinic.controllers;
 
 import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.service.PatientService;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +33,16 @@ public class PatientController {
         return ResponseEntity.ok().body(patientService.getPatientById(id));
     }
 
+    @GetMapping("/details")
+    public ResponseEntity<PatientDetails> getPatientDetails(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ValidationException("No authentication session found!");
+        }
+
+        UserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(patientService.getPatientDetailsByEmail(userDetails.getUsername()));
+    }
+
     @PostMapping
     public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
         return ResponseEntity.status(HttpStatus.CREATED).body(patientService.createPatient(patient));
@@ -40,8 +54,9 @@ public class PatientController {
     }
 
     @PatchMapping
-    public ResponseEntity<PatientDetails> updatePatientDetails(@RequestBody PatientDetails updatedDetails) {
-        return ResponseEntity.status(HttpStatus.OK).body(patientService.updatePatientDetails(updatedDetails));
+    public ResponseEntity<PatientDetails> updatePatientDetails(Authentication authentication, @RequestBody PatientDetails updatedDetails) {
+        MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+        return ResponseEntity.status(HttpStatus.OK).body(patientService.updatePatientDetails(userDetails, updatedDetails));
     }
 
     @DeleteMapping

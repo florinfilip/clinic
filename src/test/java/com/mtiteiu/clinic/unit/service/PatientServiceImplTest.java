@@ -4,6 +4,7 @@ import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.repository.PatientRepository;
 import com.mtiteiu.clinic.service.PatientServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PatientServiceImplTest {
+class PatientServiceImplTest {
 
     @Mock
     private PatientRepository patientRepository;
@@ -33,7 +33,7 @@ public class PatientServiceImplTest {
 
 
     @Test
-    public void testGetPatients() {
+    void testGetPatients() {
         //given
         when(patientRepository.findAll()).thenReturn(createDefaultPatientList());
 
@@ -143,6 +143,7 @@ public class PatientServiceImplTest {
         //given
 
         PatientDetails updatedDetails = createDefaultPatientDetails();
+        MyUserDetails myUserDetails = createDefaultMyUserDetails();
 
         Patient patient = createDefaultPatient();
 
@@ -150,11 +151,10 @@ public class PatientServiceImplTest {
         when(patientRepository.save(any(Patient.class))).thenReturn(patient);
 
         //when
-        PatientDetails result = patientService.updatePatientDetails(updatedDetails);
+        PatientDetails result = patientService.updatePatientDetails(myUserDetails,updatedDetails);
 
         //then
         assertNotNull(result);
-        assertEquals(updatedDetails.getGender(), result.getGender());
         assertEquals(updatedDetails.getAge(), result.getAge());
     }
 
@@ -164,8 +164,8 @@ public class PatientServiceImplTest {
         PatientDetails updatedDetails = createDefaultPatientDetails();
 
         //when.then
-        when(patientRepository.findById(1L)).thenReturn(Optional.empty());
+        when(patientRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> patientService.updatePatientDetails(updatedDetails));
+        assertThrows(NotFoundException.class, () -> patientService.updatePatientDetails(createDefaultMyUserDetails(), updatedDetails));
     }
 }

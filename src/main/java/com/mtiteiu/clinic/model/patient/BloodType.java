@@ -1,5 +1,8 @@
 package com.mtiteiu.clinic.model.patient;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum BloodType {
     O_POSITIVE("O+"),
     O_NEGATIVE("O-"),
@@ -14,7 +17,18 @@ public enum BloodType {
         this.displayName = displayName;
     }
 
+    @JsonValue
     String getDisplayName() {
         return this.displayName;
+    }
+
+    @JsonCreator
+    public static BloodType fromValue(String value) {
+        for (BloodType bloodType : BloodType.values()) {
+            if (bloodType.getDisplayName().equalsIgnoreCase(value)) {
+                return bloodType;
+            }
+        }
+        throw new IllegalArgumentException("Invalid BloodType value: " + value);
     }
 }

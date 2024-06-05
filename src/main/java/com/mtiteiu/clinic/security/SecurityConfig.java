@@ -28,10 +28,9 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(HttpMethod.POST, "/auth", "/authenticate")
-                                .permitAll()
-                                .anyRequest().permitAll()
-                )
+                        auth.requestMatchers(HttpMethod.POST, "/auth", "/authenticate").permitAll()
+                                .anyRequest().permitAll())
+                .formLogin(AbstractHttpConfigurer::disable)
                 .authenticationProvider(authenticationProvider)
                 .sessionManagement(ses -> ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

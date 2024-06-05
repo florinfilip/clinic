@@ -1,5 +1,6 @@
 package com.mtiteiu.clinic.security;
 
+import com.mtiteiu.clinic.exception.UnauthorizedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,16 +39,23 @@ public class JWTAuthFilter extends OncePerRequestFilter {
             return;
         }
         jwtToken = authHeader.substring(7);
-        userEmail = jwtUtils.extractUsername(jwtToken);
+
+        try {
+            userEmail = jwtUtils.extractUsername(jwtToken);
+        } catch (Exception e) {
+            throw new UnauthorizedException(String.format("Invalid token! Error: %s", e.getMessage()));
+        }
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
 
-            if (jwtUtils.isTokenValid(jwtToken, userDetails)) {
+            if (Boolean.TRUE.equals(jwtUtils.isTokenValid(jwtToken, userDetails))) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            } else {
+                throw new UnauthorizedException("User session token is not valid!");
             }
         }
         filterChain.doFilter(request, response);

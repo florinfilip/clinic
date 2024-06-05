@@ -1,12 +1,12 @@
 -- Create pacients
-INSERT INTO PERSONS (PERSON_TYPE, cnp, DATE_OF_BIRTH, first_name, last_name, phone_number)
-VALUES ('PATIENT', '1981009416023', TO_DATE('1999-06-06', 'YYYY-MM-DD'), 'Harry', 'Potter', '0742341231');
+INSERT INTO PERSONS (PERSON_TYPE, cnp, GENDER, DATE_OF_BIRTH, first_name, last_name, phone_number)
+VALUES ('PATIENT',  '1981009416023', 'MALE', TO_DATE('1999-06-06', 'YYYY-MM-DD'), 'Harry', 'Potter', '0742341231');
 
-INSERT INTO PERSONS (PERSON_TYPE, cnp, DATE_OF_BIRTH, first_name, last_name, phone_number)
-VALUES ('PATIENT', '1981009226021', TO_DATE('1999-07-06', 'YYYY-MM-DD'), 'Popescu', 'Ion', '0712312323');
+INSERT INTO PERSONS (PERSON_TYPE, cnp, GENDER, DATE_OF_BIRTH, first_name, last_name, phone_number)
+VALUES ('PATIENT', '1981009226021', 'MALE',TO_DATE('1999-07-06', 'YYYY-MM-DD'), 'Popescu', 'Ion', '0712312323');
 
-INSERT INTO PERSONS (PERSON_TYPE, cnp, DATE_OF_BIRTH, first_name, last_name, phone_number)
-VALUES ('PATIENT', '1990412180042', TO_DATE('1999-02-06', 'YYYY-MM-DD'), 'John', 'Doe', '0123123231');
+INSERT INTO PERSONS (PERSON_TYPE, cnp, GENDER, DATE_OF_BIRTH, first_name, last_name, phone_number)
+VALUES ('PATIENT', '1990412180042','MALE', TO_DATE('1999-02-06', 'YYYY-MM-DD'), 'John', 'Doe', '0123123231');
 
 -- Create Users
 

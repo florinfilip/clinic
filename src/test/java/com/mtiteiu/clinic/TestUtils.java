@@ -2,6 +2,7 @@ package com.mtiteiu.clinic;
 
 import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.model.patient.*;
+import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ public class TestUtils {
 
     public static User createUser(String email, String password, String phoneNumber, Patient patient) {
         return User.builder()
+                .id(1L)
                 .email(email)
                 .password(password)
                 .phoneNumber(phoneNumber)
@@ -50,6 +52,7 @@ public class TestUtils {
         return UserDTO.builder()
                 .firstName(username)
                 .lastName(lastName)
+                .cnp(CNP)
                 .password(password)
                 .repeatPassword(rPassword)
                 .phoneNumber(phoneNumber)
@@ -123,7 +126,6 @@ public class TestUtils {
                 .id(1L)
                 .age(20)
                 .allergies(Collections.emptyList())
-                .gender(Gender.MALE)
                 .bloodType(BloodType.AB_NEGATIVE)
                 .race(Race.HISPANIC)
                 .religion(Religion.ORTODOX)
@@ -136,12 +138,15 @@ public class TestUtils {
         return PatientDetails.builder()
                 .age(age)
                 .allergies(Collections.emptyList())
-                .gender(gender)
                 .bloodType(bloodType)
                 .race(race)
                 .religion(religion)
                 .height(height)
                 .weight(weight)
                 .build();
+    }
+
+    public static MyUserDetails createDefaultMyUserDetails(){
+        return MyUserDetails.builder().user(createDefaultUser()).build();
     }
 }

@@ -2,6 +2,7 @@ package com.mtiteiu.clinic.service;
 
 import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.user.MyUserDetails;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -19,5 +20,7 @@ public interface PatientService {
     Patient updatePatient(Patient patient);
 
     @Transactional
-    PatientDetails updatePatientDetails(PatientDetails updatedDetails);
+    PatientDetails updatePatientDetails(MyUserDetails userDetails, PatientDetails updatedDetails);
+
+    PatientDetails getPatientDetailsByEmail(String email);
 }
