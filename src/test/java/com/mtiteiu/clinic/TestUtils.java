@@ -34,13 +34,16 @@ public class TestUtils {
     }
 
     public static User createDefaultUser() {
-        return createUser(PASSWORD,
+        return createUser(
                 EMAIL,
+                PASSWORD,
                 PHONE_NUMBER,
                 Patient.builder()
+                        .user(createUser(EMAIL, PASSWORD, PHONE_NUMBER, createDefaultPatient()))
                         .firstName(FIRST_NAME)
                         .lastName(LAST_NAME)
                         .phoneNumber(PHONE_NUMBER)
+                        .patientDetails(createDefaultPatientDetails())
                         .build());
     }
 
@@ -68,14 +71,6 @@ public class TestUtils {
                 "password",
                 "0762537817",
                 "test@test.com");
-    }
-
-    public static <T> boolean responseNotNull(ResponseEntity<T> response) {
-        if (!response.getStatusCode().is2xxSuccessful() && response.getBody() == null) {
-            log.error("Error response status or null body!");
-            return false;
-        }
-        return true;
     }
 
     public static <T> AbstractBooleanAssert<?> assertResponseNotNull(ResponseEntity<T> actual) {
@@ -134,7 +129,7 @@ public class TestUtils {
                 .build();
     }
 
-    public static PatientDetails createPatientDetails(Integer age, Gender gender, BloodType bloodType, Race race, Religion religion, Double height, Double weight) {
+    public static PatientDetails createPatientDetails(Integer age, BloodType bloodType, Race race, Religion religion, Double height, Double weight) {
         return PatientDetails.builder()
                 .age(age)
                 .allergies(Collections.emptyList())
@@ -146,7 +141,7 @@ public class TestUtils {
                 .build();
     }
 
-    public static MyUserDetails createDefaultMyUserDetails(){
+    public static MyUserDetails createDefaultMyUserDetails() {
         return MyUserDetails.builder().user(createDefaultUser()).build();
     }
 }

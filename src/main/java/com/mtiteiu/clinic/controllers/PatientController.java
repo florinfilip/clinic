@@ -55,6 +55,9 @@ public class PatientController {
 
     @PatchMapping
     public ResponseEntity<PatientDetails> updatePatientDetails(Authentication authentication, @RequestBody PatientDetails updatedDetails) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ValidationException("No authentication session found!");
+        }
         MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
         return ResponseEntity.status(HttpStatus.OK).body(patientService.updatePatientDetails(userDetails, updatedDetails));
     }
