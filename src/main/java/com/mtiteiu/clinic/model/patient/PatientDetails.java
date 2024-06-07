@@ -2,9 +2,11 @@ package com.mtiteiu.clinic.model.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.ValidationException;
 import lombok.*;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.time.Period;
 
 @Entity
 @Getter
@@ -40,28 +42,28 @@ public class PatientDetails {
 
     private Diet diet;
 
-    private Boolean smoker;
+    private String smoker;
 
-    private Boolean alcohol;
+    private String alcohol;
 
 
-    @ElementCollection
-    @CollectionTable(name = "allergies", joinColumns = @JoinColumn(name = "patient_id"))
-    private List<String> allergies;
+    //    @ElementCollection
+//    @CollectionTable(name = "allergies", joinColumns = @JoinColumn(name = "patient_id"))
+    private String allergies;
 
-    @ElementCollection
-    @CollectionTable(name = "vices", joinColumns = @JoinColumn(name = "patient_id"))
-    private List<String> conditions;
+    //    @ElementCollection
+//    @CollectionTable(name = "vices", joinColumns = @JoinColumn(name = "patient_id"))
+    private String conditions;
 
-    @ElementCollection
-    @CollectionTable(name = "chronic_conditions", joinColumns = @JoinColumn(name = "patient_id"))
-    private List<String> chronicConditions;
+    //    @ElementCollection
+//    @CollectionTable(name = "chronic_conditions", joinColumns = @JoinColumn(name = "patient_id"))
+    private String chronicConditions;
 
-//    public Integer getAge() {
-//        var dateOfBirth = patient.getDateOfBirth();
-//        if (dateOfBirth == null) {
-//            throw new ValidationException("Date of birth is null for patient with id %s!");
-//        }
-//        return Period.between(dateOfBirth, LocalDate.now()).getYears();
-//    }
+    public Integer getUserAge() {
+        var dateOfBirth = patient.getDateOfBirth();
+        if (dateOfBirth == null) {
+            throw new ValidationException("Date of birth is null for patient with id %s!");
+        }
+        return Period.between(dateOfBirth, LocalDate.now()).getYears();
+    }
 }

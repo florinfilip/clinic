@@ -11,7 +11,6 @@ import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -84,6 +83,7 @@ public class TestUtils {
     public static Patient createDefaultPatient() {
         return Patient.builder()
                 .id(1L)
+                .dateOfBirth(LocalDate.of(1999, 3, 3))
                 .firstName(FIRST_NAME)
                 .lastName(LAST_NAME)
                 .cnp(CNP)
@@ -120,7 +120,7 @@ public class TestUtils {
                         .build())
                 .id(1L)
                 .age(20)
-                .allergies(Collections.emptyList())
+                .allergies("ASD")
                 .bloodType(BloodType.AB_NEGATIVE)
                 .race(Race.HISPANIC)
                 .religion(Religion.ORTODOX)
@@ -132,7 +132,7 @@ public class TestUtils {
     public static PatientDetails createPatientDetails(Integer age, BloodType bloodType, Race race, Religion religion, Double height, Double weight) {
         return PatientDetails.builder()
                 .age(age)
-                .allergies(Collections.emptyList())
+                .allergies("asd")
                 .bloodType(bloodType)
                 .race(race)
                 .religion(religion)

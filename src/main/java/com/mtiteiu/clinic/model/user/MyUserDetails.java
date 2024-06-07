@@ -54,4 +54,8 @@ public record MyUserDetails(User user) implements UserDetails {
     public Long getUserId() {
         return user.getId();
     }
+
+    public Boolean getHasPatientDetails(){
+        return user.getPerson().getPatientDetails() != null;
+    }
 }

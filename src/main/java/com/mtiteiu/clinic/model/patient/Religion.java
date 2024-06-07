@@ -4,15 +4,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Religion {
-    PROTESTANT("Protestantism"),
+    PROTESTANT("Protestant"),
     CATOLIC("Catolic"),
     ORTODOX("Ortodox"),
-    ISLAM("Islam"),
-    HINDUISM("Hindui"),
-    BUDISM("Budism"),
-    IUDAISM("Iudaism"),
-    BAHAI("Bahai"),
-    SHINTO("Shinto"),
+    ISLAM("Islamic"),
+    HINDUISM("Hinduist"),
+    BUDISM("Budist"),
+    IUDAISM("Judaist"),
     OTHER("Alta");
     private final String displayName;
 

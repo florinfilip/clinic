@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum CivilStatus {
     MARRIED("Căsătorit"),
+    UNMARRIED("Necăsătorit"),
     DIVORCED("Divorțat"),
     WIDOWED("Văduv"),
     ENGAGED("Logodit"),

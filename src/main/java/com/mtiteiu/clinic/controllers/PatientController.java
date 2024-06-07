@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class PatientController {
 
     private final PatientService patientService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<List<Patient>> getPatients() {
         return ResponseEntity.ok().body(patientService.getPatients());
@@ -54,6 +56,7 @@ public class PatientController {
     }
 
     @PatchMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PatientDetails> updatePatientDetails(Authentication authentication, @RequestBody PatientDetails updatedDetails) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new ValidationException("No authentication session found!");

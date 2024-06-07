@@ -169,7 +169,7 @@ class PatientServiceImplTest {
 
         //when.then
         when(patientRepository.findById(anyLong())).thenReturn(Optional.empty());
-        
+
         assertThrows(NotFoundException.class, () -> patientService.updatePatientDetails(createDefaultMyUserDetails(), updatedDetails));
     }
 

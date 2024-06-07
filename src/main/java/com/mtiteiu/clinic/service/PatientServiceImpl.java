@@ -105,6 +105,8 @@ public class PatientServiceImpl implements PatientService {
                 new NotFoundException(String.format("Patient with id %s not found!", id)));
 
         PatientDetails details = Optional.ofNullable(patient.getPatientDetails()).orElse(new PatientDetails());
+        details.setPatient(patient);
+        details.setAge(details.getUserAge());
 
         PatientDetailsMapper.INSTANCE.updatePatientDetails(updatedDetails, details);
 
