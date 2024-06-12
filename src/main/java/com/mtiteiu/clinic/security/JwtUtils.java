@@ -50,7 +50,7 @@ public class JwtUtils {
 
     public Boolean isTokenValid(String token, UserDetails userDetails) {
         final String userName = extractUsername(token);
-        return (userName.equals(userDetails.getUsername()));
+        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -68,11 +68,5 @@ public class JwtUtils {
                 .expiration(Date.from(LocalDateTime.now().plusHours(24).atZone(ZoneId.systemDefault()).toInstant()))
                 .signWith(getSigningKey())
                 .compact();
-    }
-
-
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }

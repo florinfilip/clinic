@@ -5,8 +5,10 @@ import com.mtiteiu.clinic.controllers.UserController;
 import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.model.patient.Patient;
+import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.service.UserService;
+import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,14 +16,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static com.mtiteiu.clinic.TestUtils.createDefaultUser;
-import static com.mtiteiu.clinic.TestUtils.createUser;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.mtiteiu.clinic.TestUtils.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -31,6 +33,9 @@ class UserControllerTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private Authentication authentication;
 
     @InjectMocks
     private UserController userController;
@@ -117,5 +122,40 @@ class UserControllerTest {
 
         // When
         assertThrows(NotFoundException.class, () -> userController.deleteUser(1L));
+    }
+
+    @Test
+    void getUserDetails_Authenticated_ReturnsUserDetails() {
+        // given
+        MyUserDetails mockUserDetails = createDefaultMyUserDetails();
+        when(authentication.isAuthenticated()).thenReturn(true);
+        when(authentication.getPrincipal()).thenReturn(mockUserDetails);
+
+        // when
+        ResponseEntity<UserDetails> response = userController.getUserDetails(authentication);
+
+        // then
+        assertNotNull(response);
+        assertTrue(response.getStatusCode().is2xxSuccessful());
+        assertEquals(mockUserDetails, response.getBody());
+    }
+
+    @Test
+    void getUserDetails_NotAuthenticated_ThrowsValidationException() {
+        // given
+        when(authentication.isAuthenticated()).thenReturn(false);
+
+        // when
+        ValidationException exception = assertThrows(ValidationException.class, () -> userController.getUserDetails(authentication));
+        //then
+        assertEquals("No authentication session found!", exception.getMessage());
+    }
+
+    @Test
+    void getUserDetails_NullAuthentication_ThrowsValidationException() {
+        // when/then
+        ValidationException exception = assertThrows(ValidationException.class, () -> userController.getUserDetails(null));
+
+        assertEquals("No authentication session found!", exception.getMessage());
     }
 }

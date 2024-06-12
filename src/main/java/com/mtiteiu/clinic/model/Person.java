@@ -1,12 +1,16 @@
 package com.mtiteiu.clinic.model;
 
 import com.mtiteiu.clinic.model.patient.Gender;
+import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.validation.ValidCNP;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
@@ -20,7 +24,7 @@ import java.time.LocalDate;
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "person_type")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Person {
+public abstract class Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +33,6 @@ public class Person {
     @OneToOne(mappedBy = "person")
     private User user;
 
-    @NotNull
     private LocalDate dateOfBirth;
 
     @ValidCNP
@@ -50,4 +53,6 @@ public class Person {
     @Column(unique = true)
     @Min(value = 10, message = "Please check your phone number!")
     private String phoneNumber;
+
+    public abstract PatientDetails getPatientDetails();
 }

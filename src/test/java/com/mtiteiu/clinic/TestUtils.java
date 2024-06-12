@@ -2,6 +2,7 @@ package com.mtiteiu.clinic;
 
 import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.model.patient.*;
+import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,6 @@ import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -22,6 +22,7 @@ public class TestUtils {
 
     public static User createUser(String email, String password, String phoneNumber, Patient patient) {
         return User.builder()
+                .id(1L)
                 .email(email)
                 .password(password)
                 .phoneNumber(phoneNumber)
@@ -32,13 +33,16 @@ public class TestUtils {
     }
 
     public static User createDefaultUser() {
-        return createUser(PASSWORD,
+        return createUser(
                 EMAIL,
+                PASSWORD,
                 PHONE_NUMBER,
                 Patient.builder()
+                        .user(createUser(EMAIL, PASSWORD, PHONE_NUMBER, createDefaultPatient()))
                         .firstName(FIRST_NAME)
                         .lastName(LAST_NAME)
                         .phoneNumber(PHONE_NUMBER)
+                        .patientDetails(createDefaultPatientDetails())
                         .build());
     }
 
@@ -50,6 +54,7 @@ public class TestUtils {
         return UserDTO.builder()
                 .firstName(username)
                 .lastName(lastName)
+                .cnp(CNP)
                 .password(password)
                 .repeatPassword(rPassword)
                 .phoneNumber(phoneNumber)
@@ -67,14 +72,6 @@ public class TestUtils {
                 "test@test.com");
     }
 
-    public static <T> boolean responseNotNull(ResponseEntity<T> response) {
-        if (!response.getStatusCode().is2xxSuccessful() && response.getBody() == null) {
-            log.error("Error response status or null body!");
-            return false;
-        }
-        return true;
-    }
-
     public static <T> AbstractBooleanAssert<?> assertResponseNotNull(ResponseEntity<T> actual) {
 
         Predicate<ResponseEntity<T>> predicate = (response) -> response.getStatusCode().is2xxSuccessful() && response.getBody() != null;
@@ -86,6 +83,7 @@ public class TestUtils {
     public static Patient createDefaultPatient() {
         return Patient.builder()
                 .id(1L)
+                .dateOfBirth(LocalDate.of(1999, 3, 3))
                 .firstName(FIRST_NAME)
                 .lastName(LAST_NAME)
                 .cnp(CNP)
@@ -122,8 +120,7 @@ public class TestUtils {
                         .build())
                 .id(1L)
                 .age(20)
-                .allergies(Collections.emptyList())
-                .gender(Gender.MALE)
+                .allergies("ASD")
                 .bloodType(BloodType.AB_NEGATIVE)
                 .race(Race.HISPANIC)
                 .religion(Religion.ORTODOX)
@@ -132,16 +129,19 @@ public class TestUtils {
                 .build();
     }
 
-    public static PatientDetails createPatientDetails(Integer age, Gender gender, BloodType bloodType, Race race, Religion religion, Double height, Double weight) {
+    public static PatientDetails createPatientDetails(Integer age, BloodType bloodType, Race race, Religion religion, Double height, Double weight) {
         return PatientDetails.builder()
                 .age(age)
-                .allergies(Collections.emptyList())
-                .gender(gender)
+                .allergies("asd")
                 .bloodType(bloodType)
                 .race(race)
                 .religion(religion)
                 .height(height)
                 .weight(weight)
                 .build();
+    }
+
+    public static MyUserDetails createDefaultMyUserDetails() {
+        return MyUserDetails.builder().user(createDefaultUser()).build();
     }
 }

@@ -1,16 +1,14 @@
 package com.mtiteiu.clinic.model.user;
 
-import lombok.RequiredArgsConstructor;
+import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-@RequiredArgsConstructor
-public class MyUserDetails implements UserDetails {
-
-    private final User user;
+@Builder
+public record MyUserDetails(User user) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -47,5 +45,17 @@ public class MyUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return user.getEnabled();
+    }
+
+    public String getDisplayName() {
+        return user.getPerson().getLastName();
+    }
+
+    public Long getUserId() {
+        return user.getId();
+    }
+
+    public Boolean getHasPatientDetails(){
+        return user.getPerson().getPatientDetails() != null;
     }
 }

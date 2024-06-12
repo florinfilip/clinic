@@ -1,6 +1,7 @@
 package com.mtiteiu.clinic.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mtiteiu.clinic.model.patient.Gender;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 public class UserDTO {
     String cnp;
     LocalDate dateOfBirth;
+    Gender gender;
     String email;
     String password;
     String repeatPassword;

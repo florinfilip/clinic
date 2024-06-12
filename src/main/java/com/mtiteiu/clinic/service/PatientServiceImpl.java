@@ -3,9 +3,13 @@ package com.mtiteiu.clinic.service;
 import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.mapper.PatientDetailsMapper;
+import com.mtiteiu.clinic.model.Person;
 import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.user.MyUserDetails;
+import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.PatientRepository;
+import com.mtiteiu.clinic.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +24,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PatientServiceImpl implements PatientService {
+    private final UserRepository userRepository;
 
     private final PatientRepository patientRepository;
 
@@ -92,19 +97,38 @@ public class PatientServiceImpl implements PatientService {
 
     @Transactional
     @Override
-    public PatientDetails updatePatientDetails(PatientDetails updatedDetails) {
-        Long id = updatedDetails.getPatient().getId();
+    public PatientDetails updatePatientDetails(MyUserDetails userDetails, PatientDetails updatedDetails) {
+
+        Long id = userDetails.getUserId();
 
         Patient patient = patientRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Patient with id %s not found!", id)));
 
-
         PatientDetails details = Optional.ofNullable(patient.getPatientDetails()).orElse(new PatientDetails());
+        details.setPatient(patient);
+        details.setAge(details.getUserAge());
 
         PatientDetailsMapper.INSTANCE.updatePatientDetails(updatedDetails, details);
 
         patient.setPatientDetails(details);
         patientRepository.save(patient);
         return details;
+    }
+
+    @Override
+    public PatientDetails getPatientDetailsByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(String.format("User with email %s not found!", email)));
+
+        return getPersonPatientDetails(user.getPerson());
+    }
+
+
+    private <T extends Person> PatientDetails getPersonPatientDetails(T person) {
+        if (person != null) {
+            return person.getPatientDetails();
+        } else {
+            throw new NotFoundException("Person %s is null!");
+        }
     }
 }

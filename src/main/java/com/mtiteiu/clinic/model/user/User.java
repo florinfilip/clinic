@@ -1,5 +1,6 @@
 package com.mtiteiu.clinic.model.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mtiteiu.clinic.model.Person;
 import jakarta.persistence.*;
@@ -50,7 +51,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-    @JsonIgnoreProperties("user")
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "person_id", referencedColumnName = "id")
     private Person person;

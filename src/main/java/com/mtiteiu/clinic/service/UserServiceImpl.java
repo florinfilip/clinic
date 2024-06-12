@@ -4,8 +4,8 @@ import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
+import com.mtiteiu.clinic.model.Person;
 import com.mtiteiu.clinic.model.patient.Patient;
-import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static com.mtiteiu.clinic.model.user.UserRoles.USER;
+import static com.mtiteiu.clinic.util.Utils.getBirthDateFromCNP;
 
 @Data
 @Slf4j
@@ -72,25 +73,25 @@ public class UserServiceImpl implements UserService {
 
         checkValidPassword(request);
 
-        Patient personDetails = patientRepository.findPatientByPhoneNumber(request.getPhoneNumber())
-                .orElseGet(() -> Patient.builder()
+        Person patient = patientRepository.findPatientByPhoneNumber(request.getPhoneNumber())
+                .orElse(Patient.builder()
                         .firstName(request.getFirstName())
                         .lastName(request.getLastName())
                         .cnp(request.getCnp())
-                        .dateOfBirth(request.getDateOfBirth())
+                        .gender(request.getGender())
+                        .dateOfBirth(getBirthDateFromCNP(request.getCnp()))
                         .phoneNumber(request.getPhoneNumber())
-                        .patientDetails(new PatientDetails())
                         .build());
 
         var newUser = User.builder()
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .password(bCryptPasswordEncoder.encode(request.getPassword()))
-                .person(personDetails)
+                .person(patient)
                 .enabled(true)
                 .roles(Set.of(defaultRole)).build();
 
-        personDetails.setUser(newUser);
+        patient.setUser(newUser);
 
         try {
             userRepository.save(newUser);

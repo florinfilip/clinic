@@ -7,7 +7,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
 
 @Entity
 @Getter
@@ -22,12 +21,10 @@ public class PatientDetails {
     private Long id;
 
     @OneToOne(mappedBy = "patientDetails")
-    @JsonIgnoreProperties("patientDetails")
+    @JsonIgnoreProperties({"patientDetails", "user"})
     private Patient patient;
 
     private Integer age;
-
-    private Race race;
 
     private Double weight;
 
@@ -37,11 +34,32 @@ public class PatientDetails {
 
     private Religion religion;
 
-    @ElementCollection
-    @CollectionTable(name = "allergies", joinColumns = @JoinColumn(name = "patient_id"))
-    private List<String> allergies;
+    private Race race;
 
-    public Integer getAge() {
+    private ProfessionalStatus professionalStatus;
+
+    private CivilStatus civilStatus;
+
+    private Diet diet;
+
+    private String smoker;
+
+    private String alcohol;
+
+
+    //    @ElementCollection
+//    @CollectionTable(name = "allergies", joinColumns = @JoinColumn(name = "patient_id"))
+    private String allergies;
+
+    //    @ElementCollection
+//    @CollectionTable(name = "vices", joinColumns = @JoinColumn(name = "patient_id"))
+    private String conditions;
+
+    //    @ElementCollection
+//    @CollectionTable(name = "chronic_conditions", joinColumns = @JoinColumn(name = "patient_id"))
+    private String chronicConditions;
+
+    public Integer getUserAge() {
         var dateOfBirth = patient.getDateOfBirth();
         if (dateOfBirth == null) {
             throw new ValidationException("Date of birth is null for patient with id %s!");

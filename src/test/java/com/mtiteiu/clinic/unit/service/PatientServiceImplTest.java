@@ -2,9 +2,11 @@ package com.mtiteiu.clinic.unit.service;
 
 import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
-import com.mtiteiu.clinic.model.patient.Patient;
-import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.patient.*;
+import com.mtiteiu.clinic.model.user.MyUserDetails;
+import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.PatientRepository;
+import com.mtiteiu.clinic.repository.UserRepository;
 import com.mtiteiu.clinic.service.PatientServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,17 +24,20 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PatientServiceImplTest {
+class PatientServiceImplTest {
 
     @Mock
     private PatientRepository patientRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private PatientServiceImpl patientService;
 
 
     @Test
-    public void testGetPatients() {
+    void testGetPatients() {
         //given
         when(patientRepository.findAll()).thenReturn(createDefaultPatientList());
 
@@ -143,6 +147,7 @@ public class PatientServiceImplTest {
         //given
 
         PatientDetails updatedDetails = createDefaultPatientDetails();
+        MyUserDetails myUserDetails = createDefaultMyUserDetails();
 
         Patient patient = createDefaultPatient();
 
@@ -150,11 +155,10 @@ public class PatientServiceImplTest {
         when(patientRepository.save(any(Patient.class))).thenReturn(patient);
 
         //when
-        PatientDetails result = patientService.updatePatientDetails(updatedDetails);
+        PatientDetails result = patientService.updatePatientDetails(myUserDetails, updatedDetails);
 
         //then
         assertNotNull(result);
-        assertEquals(updatedDetails.getGender(), result.getGender());
         assertEquals(updatedDetails.getAge(), result.getAge());
     }
 
@@ -164,8 +168,82 @@ public class PatientServiceImplTest {
         PatientDetails updatedDetails = createDefaultPatientDetails();
 
         //when.then
-        when(patientRepository.findById(1L)).thenReturn(Optional.empty());
+        when(patientRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> patientService.updatePatientDetails(updatedDetails));
+        assertThrows(NotFoundException.class, () -> patientService.updatePatientDetails(createDefaultMyUserDetails(), updatedDetails));
+    }
+
+
+    @Test
+    void updatePatientDetails_patientExists_returnsUpdatedDetails() {
+        // given
+        MyUserDetails userDetails = createDefaultMyUserDetails();
+        Patient patient = createDefaultPatient();
+        PatientDetails updatedDetails = createPatientDetails(
+                18,
+                BloodType.AB_NEGATIVE,
+                Race.HISPANIC,
+                Religion.ORTODOX,
+                170.00,
+                70.00);
+
+
+        when(patientRepository.findById(anyLong())).thenReturn(Optional.of(patient));
+        when(patientRepository.save(patient)).thenReturn(patient);
+
+        // when
+        PatientDetails result = patientService.updatePatientDetails(userDetails, updatedDetails);
+
+        // then
+        assertNotNull(result);
+        verify(patientRepository).save(patient);
+    }
+
+    @Test
+    void updatePatientDetails_PatientNotFound_ThrowsNotFoundException() {
+        // given
+        Long userId = 1L;
+        MyUserDetails userDetails = createDefaultMyUserDetails();
+        PatientDetails updatedDetails = createPatientDetails(
+                18,
+                BloodType.AB_NEGATIVE,
+                Race.HISPANIC,
+                Religion.ORTODOX,
+                170.00,
+                70.00);
+
+        when(patientRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // when/then
+        assertThrows(NotFoundException.class, () -> patientService.updatePatientDetails(userDetails, updatedDetails));
+    }
+
+    // Tests for getPatientDetailsByEmail
+    @Test
+    void getPatientDetailsByEmail_userExists_returnsPatientDetails() {
+        // given
+
+        User user = createDefaultUser();
+        PatientDetails patientDetails = user.getPerson().getPatientDetails();
+
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+
+        // when
+        PatientDetails result = patientService.getPatientDetailsByEmail(user.getEmail());
+
+        // then
+        assertNotNull(result);
+        assertEquals(patientDetails, result);
+    }
+
+    @Test
+    void getPatientDetailsByEmail_userNotFound_throwsNotFoundException() {
+        // given
+        String email = "user@example.com";
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        // when/then
+        assertThrows(NotFoundException.class, () -> patientService.getPatientDetailsByEmail(email));
     }
 }
