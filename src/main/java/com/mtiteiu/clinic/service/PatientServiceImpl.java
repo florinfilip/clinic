@@ -14,6 +14,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -47,7 +48,6 @@ public class PatientServiceImpl implements PatientService {
 
             if (ex.getCause() instanceof ConstraintViolationException constraintViolationEx) {
                 String columnName = constraintViolationEx.getConstraintName();
-
                 errorMessage += String.format("Unique constraint violation on column: %s", columnName);
             } else {
                 errorMessage += "A unique constraint violation occurred.";
@@ -99,7 +99,7 @@ public class PatientServiceImpl implements PatientService {
                 new NotFoundException(String.format("Patient with id %s not found!", id)));
 
 
-        var details = patient.getPatientDetails();
+        PatientDetails details = Optional.ofNullable(patient.getPatientDetails()).orElse(new PatientDetails());
 
         PatientDetailsMapper.INSTANCE.updatePatientDetails(updatedDetails, details);
 

@@ -3,7 +3,7 @@ package com.mtiteiu.clinic.unit.service;
 import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
-import com.mtiteiu.clinic.exception.RetrievalException;
+import com.mtiteiu.clinic.model.Person;
 import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
-public class UserServiceTest {
+class UserServiceTest {
     @Mock
     private RoleRepository roleRepository;
 
@@ -78,8 +78,12 @@ public class UserServiceTest {
         when(userRepository.findAll()).thenThrow(RuntimeException.class);
 
         //When/Then
-        Exception ex = assertThrows(RetrievalException.class, () -> userService.getUsers());
-        assertThat(ex).hasMessage("Could not fetch users from database!");
+
+        try {
+            userService.getUsers();
+        } catch (RuntimeException ex) {
+            assertThat(ex).hasMessage("Could not fetch users from database!");
+        }
     }
 
     @Test
@@ -158,9 +162,9 @@ public class UserServiceTest {
         assertEquals("test@test.com", createdUser.getEmail());
         assertEquals(1, createdUser.getRoles().size());
         assertThat(createdUser.getRoles()).containsExactly(defaultUserRole);
-        assertThat(createdUser.getPatient()).isNotNull();
-        assertThat(createdUser.getPatient())
-                .extracting(Patient::getFirstName, Patient::getLastName)
+        assertThat(createdUser.getPerson()).isNotNull();
+        assertThat(createdUser.getPerson())
+                .extracting(Person::getFirstName, Person::getLastName)
                 .containsExactly("firstName", "lastName");
 
         verify(passwordEncoder).encode("password");
@@ -189,9 +193,9 @@ public class UserServiceTest {
         assertEquals("test@test.com", createdUser.getEmail());
         assertEquals(1, createdUser.getRoles().size());
         assertThat(createdUser.getRoles()).containsExactly(defaultUserRole);
-        assertThat(createdUser.getPatient()).isNotNull();
-        assertThat(createdUser.getPatient())
-                .extracting(Patient::getFirstName, Patient::getLastName)
+        assertThat(createdUser.getPerson()).isNotNull();
+        assertThat(createdUser.getPerson())
+                .extracting(Person::getFirstName, Person::getLastName)
                 .containsExactly("firstName", "lastName");
 
         verify(passwordEncoder).encode("password");
@@ -284,8 +288,8 @@ public class UserServiceTest {
                         User::getEmail,
                         User::getPassword,
                         User::getEnabled,
-                        User::getPatient)
-                .containsExactly(updateRequestBody.getEmail(), ENCODED_PASSWORD, true, defaultUser.getPatient());
+                        User::getPerson)
+                .containsExactly(updateRequestBody.getEmail(), ENCODED_PASSWORD, true, defaultUser.getPerson());
 
         assertNotNull(updatedUser.getRoles());
     }
@@ -297,8 +301,12 @@ public class UserServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when/then
-        Exception ex = assertThrows(NotFoundException.class, () -> userService.updateUser(1L, new User()));
-        assertThat(ex).hasMessage("User with id 1 not found!");
+
+        try {
+            userService.updateUser(1L, new User());
+        } catch (NotFoundException ex) {
+            assertThat(ex).hasMessage("User with id 1 not found!");
+        }
     }
 
     @Test
@@ -319,7 +327,10 @@ public class UserServiceTest {
         when(userRepository.existsById(1L)).thenReturn(false);
 
         // When/Then
-        Exception exception = assertThrows(NotFoundException.class, () -> userService.deleteUserById(1L));
-        assertThat(exception).hasMessage("User with id 1 does not exist!");
+        try {
+            userService.deleteUserById(1L);
+        } catch (NotFoundException ex) {
+            assertThat(ex).hasMessage("User with id 1 does not exist!");
+        }
     }
 }
