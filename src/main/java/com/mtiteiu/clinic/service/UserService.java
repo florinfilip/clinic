@@ -1,6 +1,7 @@
 package com.mtiteiu.clinic.service;
 
 import com.mtiteiu.clinic.dto.UserDTO;
+import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -12,7 +13,7 @@ public interface UserService extends UserDetailsService {
 
     User createUser(UserDTO user);
 
-    User updateUser(Long id, User user);
+    User updateUser(MyUserDetails userDetails, UserDTO updateDetails);
 
     User getUserById(Long id);
 

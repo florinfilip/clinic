@@ -4,6 +4,7 @@ import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
+import com.mtiteiu.clinic.mapper.UserMapper;
 import com.mtiteiu.clinic.model.Person;
 import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.user.MyUserDetails;
@@ -13,6 +14,7 @@ import com.mtiteiu.clinic.repository.PatientRepository;
 import com.mtiteiu.clinic.repository.PersonRepository;
 import com.mtiteiu.clinic.repository.RoleRepository;
 import com.mtiteiu.clinic.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -55,13 +57,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("User with id %s not found!", id)));
+                .orElseThrow(() -> new NotFoundException(String.format("User-ul cu id %s nu a fost gasit!", id)));
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return new MyUserDetails(userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("No username with value %s found!", email))));
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("User-ul cu email %s nu a fost gasit!", email))));
     }
 
     @Override
@@ -86,7 +88,7 @@ public class UserServiceImpl implements UserService {
         var newUser = User.builder()
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
-                .password(bCryptPasswordEncoder.encode(request.getPassword()))
+                .password(bCryptPasswordEncoder.encode(request.getNewPassword()))
                 .person(patient)
                 .enabled(true)
                 .roles(Set.of(defaultRole)).build();
@@ -95,7 +97,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             userRepository.save(newUser);
-            log.info("User {} created successfully!", newUser.getEmail());
+            log.info("User-ul {} a fost creat cu succes!", newUser.getEmail());
             return newUser;
         } catch (Exception ex) {
             log.error("Error while trying to save user: {} \n {}", newUser.getEmail(), ex.getMessage());
@@ -103,36 +105,88 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void checkUniqueEmail(String email) {
-        if (Boolean.TRUE.equals(userRepository.existsByEmail(email))) {
-            throw new ValidationException(String.format("Email %s is already registered!", email));
-        }
-    }
-
+    @Transactional
     @Override
-    public User updateUser(Long id, User updateDetails) {
-        var updatedUser = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("User with id %s not found!", id)));
+    public User updateUser(MyUserDetails userDetails, UserDTO updateDetails) {
+        Long id = userDetails.getUserId();
+        User updatedUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("User-ul cu id %s nu a fost gasit!", id)));
 
-        updatedUser.setPassword(updateDetails.getPassword() != null ? bCryptPasswordEncoder.encode(updateDetails.getPassword()) : updatedUser.getPassword());
-        updatedUser.setPhoneNumber(updateDetails.getPhoneNumber());
-        updatedUser.setEmail(updateDetails.getEmail());
-        log.info("User with id {} updated successfully!", id);
-        return userRepository.save(updatedUser);
+        checkUniqueFieldsValidity(userDetails, updateDetails);
+        checkValidPassword(updateDetails);
+
+        UserMapper.INSTANCE.updateUserDetails(updateDetails, updatedUser, bCryptPasswordEncoder);
+
+        try {
+            var user = userRepository.save(updatedUser);
+            log.info("User-ul cu id {} modificat cu succes!", id);
+            return user;
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
+
+        throw new RuntimeException("Error");
     }
+
 
     @Override
     public String deleteUserById(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
-            return String.format("User with id %s deleted successfully!", id);
+            return String.format("User-ul cu id %s a fost sters cu succes!", id);
         }
-        throw new NotFoundException(String.format("User with id %s does not exist!", id));
+        throw new NotFoundException(String.format("Userul cu id-ul %s nu exista!", id));
     }
 
-    private void checkValidPassword(UserDTO user) {
-        if (!Objects.equals(user.getPassword(), user.getRepeatPassword())) {
-            throw new ValidationException("Passwords do not match!");
+    private void checkUniqueFieldsValidity(MyUserDetails userDetails, UserDTO updateDetails) {
+        if (!Objects.equals(userDetails.getUsername(), updateDetails.getEmail())) {
+            checkUniqueEmail(updateDetails.getEmail());
+        }
+        if (!Objects.equals(userDetails.getPhoneNumber(), updateDetails.getPhoneNumber())) {
+            checkUniquePhoneNumber(updateDetails.getPhoneNumber());
+        }
+        if (!Objects.equals(userDetails.getCNP(), updateDetails.getCnp())) {
+            checkUniqueCNP(updateDetails.getCnp());
+        }
+    }
+
+    private void checkValidPassword(UserDTO updateDetails) {
+
+        var newPassword = updateDetails.getNewPassword();
+        var confirmPassword = updateDetails.getConfirmPassword();
+        var currentPassword = updateDetails.getCurrentPassword();
+
+        if (newPassword == null && confirmPassword == null && currentPassword == null) {
+            return;
+        }
+
+        if (updateDetails.getCurrentPassword() == null) {
+            updateDetails.setCurrentPassword("");
+        }
+        if (!Objects.equals(newPassword, confirmPassword)) {
+            throw new ValidationException("Parolele nu se potrivesc!");
+        }
+
+        if (bCryptPasswordEncoder.matches(newPassword, updateDetails.getCurrentPassword())) {
+            throw new ValidationException("Parola trebuie sa fie diferita de cea precedenta!");
+        }
+    }
+
+    private void checkUniqueEmail(String email) {
+        if (Boolean.TRUE.equals(userRepository.existsByEmail(email))) {
+            throw new ValidationException(String.format("Adresa de e-mail %s este deja inregistrata!", email));
+        }
+    }
+
+    private void checkUniquePhoneNumber(String phoneNumber) {
+        if (Boolean.TRUE.equals(userRepository.existsByPhoneNumber(phoneNumber))) {
+            throw new ValidationException(String.format("Numarul de telefon %s este deja inregistrat!", phoneNumber));
+        }
+    }
+
+    private void checkUniqueCNP(String cnp) {
+        if (Boolean.TRUE.equals(userRepository.existsByPhoneNumber(cnp))) {
+            throw new ValidationException(String.format("CNP-ul %s este deja inregistrat!", cnp));
         }
     }
 }

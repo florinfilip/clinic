@@ -1,5 +1,6 @@
 package com.mtiteiu.clinic.service;
 
+import com.mtiteiu.clinic.dto.PatientSelectionCriteriaDTO;
 import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.mapper.PatientDetailsMapper;
@@ -9,6 +10,7 @@ import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.PatientRepository;
+
 import com.mtiteiu.clinic.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -123,6 +125,10 @@ public class PatientServiceImpl implements PatientService {
         return getPersonPatientDetails(user.getPerson());
     }
 
+    @Override
+    public List<Patient> fetchEligiblePatients(PatientSelectionCriteriaDTO criteria) {
+        return patientRepository.findAll(PatientRepository.createFilterSpecs(criteria));
+    }
 
     private <T extends Person> PatientDetails getPersonPatientDetails(T person) {
         if (person != null) {

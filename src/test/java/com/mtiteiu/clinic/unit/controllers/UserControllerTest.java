@@ -89,12 +89,14 @@ class UserControllerTest {
     @Test
     void testUpdateUser() {
         //given
-        User updatedUser = createDefaultUser();
+        User updatedUser = createUpdatedUser();
+        UserDTO updatedDetails = createDefaultUserDTO();
+        MyUserDetails userDetails = createDefaultMyUserDetails();
 
-        when(userService.updateUser(anyLong(), any(User.class))).thenReturn(updatedUser);
+        when(userService.updateUser(any(MyUserDetails.class), any(UserDTO.class))).thenReturn(updatedUser);
 
         //when
-        ResponseEntity<User> response = userController.updateUser(1L, updatedUser);
+        ResponseEntity<User> response = userController.updateUser(userDetails, updatedDetails);
 
         //then
         assertEquals(HttpStatus.OK, response.getStatusCode());

@@ -1,5 +1,6 @@
 package com.mtiteiu.clinic.service;
 
+import com.mtiteiu.clinic.dto.PatientSelectionCriteriaDTO;
 import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
 import com.mtiteiu.clinic.model.user.MyUserDetails;
@@ -23,4 +24,6 @@ public interface PatientService {
     PatientDetails updatePatientDetails(MyUserDetails userDetails, PatientDetails updatedDetails);
 
     PatientDetails getPatientDetailsByEmail(String email);
+
+    List<Patient> fetchEligiblePatients(PatientSelectionCriteriaDTO criteria);
 }

@@ -1,6 +1,7 @@
 package com.mtiteiu.clinic.util;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 public class Utils {
 
@@ -25,5 +26,16 @@ public class Utils {
 
         // Create and return LocalDate object
         return LocalDate.of(year, month, day);
+    }
+
+    public static boolean isNotNullOrEmpty(Object object) {
+        if (object != null) {
+            if (object instanceof Collection<?> collection) {
+                return ! collection.isEmpty();
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 }

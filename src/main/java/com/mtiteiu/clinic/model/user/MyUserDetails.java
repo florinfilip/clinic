@@ -1,5 +1,6 @@
 package com.mtiteiu.clinic.model.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 @Builder
-public record MyUserDetails(User user) implements UserDetails {
+public record MyUserDetails(@JsonIgnore User user) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -55,7 +56,27 @@ public record MyUserDetails(User user) implements UserDetails {
         return user.getId();
     }
 
-    public Boolean getHasPatientDetails(){
+    public Boolean getHasPatientDetails() {
         return user.getPerson().getPatientDetails() != null;
+    }
+
+    public String getFirstName() {
+        return user.getPerson().getFirstName();
+    }
+
+    public String getLastName() {
+        return user.getPerson().getLastName();
+    }
+
+    public String getPhoneNumber() {
+        return user.getPhoneNumber();
+    }
+
+    public String getGender(){
+        return user.getPerson().getGender().getDisplayName();
+    }
+
+    public String getCNP() {
+        return user.getPerson().getCnp();
     }
 }
