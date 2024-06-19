@@ -15,8 +15,9 @@ public class UserDTO {
     LocalDate dateOfBirth;
     Gender gender;
     String email;
-    String password;
-    String repeatPassword;
+    String newPassword;
+    String confirmPassword;
+    String currentPassword;
     String firstName;
     String lastName;
     String phoneNumber;

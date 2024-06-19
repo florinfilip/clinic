@@ -5,6 +5,7 @@ import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.model.Person;
 import com.mtiteiu.clinic.model.patient.Patient;
+import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.Role;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.PatientRepository;
@@ -105,7 +106,7 @@ class UserServiceTest {
 
         //When/Then
         Exception ex = assertThrows(NotFoundException.class, () -> userService.getUserById(1L));
-        assertThat(ex).hasMessage("User with id 1 not found!");
+        assertThat(ex).hasMessage("User-ul cu id 1 nu a fost gasit!");
     }
 
 
@@ -130,7 +131,7 @@ class UserServiceTest {
         // When/Then
         UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
                 () -> userService.loadUserByUsername(EMAIL));
-        assertEquals("No username with value " + EMAIL + " found!", exception.getMessage());
+        assertEquals("User-ul cu email " + EMAIL + " nu a fost gasit!", exception.getMessage());
 
         verify(userRepository, times(1)).findUserByEmail(EMAIL);
     }
@@ -208,8 +209,8 @@ class UserServiceTest {
 
         var registrationRequest = UserDTO.builder()
                 .email(EMAIL)
-                .password(PASSWORD)
-                .repeatPassword("repeatPassword")
+                .newPassword(PASSWORD)
+                .confirmPassword("repeatPassword")
                 .lastName("Test")
                 .firstName("Test")
                 .build();
@@ -222,7 +223,7 @@ class UserServiceTest {
 
         Exception ex = assertThrows(ValidationException.class, () -> userService.createUser(registrationRequest));
 
-        assertThat(ex.getMessage()).isEqualTo("Passwords do not match!");
+        assertThat(ex.getMessage()).isEqualTo("Parolele nu se potrivesc!");
     }
 
     @Test
@@ -266,17 +267,14 @@ class UserServiceTest {
     void updateUser_shouldUpdateOnlyUserFields() {
         //Given
 
-        User updateRequestBody = createUser(
-                "test@gmail.com",
-                "testPassword",
-                "04567342132",
-                Patient.builder().build());
+        UserDTO updateRequestBody = createDefaultUserDTO();
+        MyUserDetails userDetails = createDefaultMyUserDetails();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(defaultUser));
         when(passwordEncoder.encode(anyString())).thenReturn(ENCODED_PASSWORD);
 
         //When
-        userService.updateUser(1L, updateRequestBody);
+        userService.updateUser(userDetails, updateRequestBody);
 
         //Then
         verify(userRepository).save(userCaptor.capture());
@@ -296,16 +294,16 @@ class UserServiceTest {
 
     @Test
     void updateUser_whenUserNotFound_shouldThrow() {
-
         //given
+        MyUserDetails userDetails = createDefaultMyUserDetails();
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when/then
 
         try {
-            userService.updateUser(1L, new User());
+            userService.updateUser(userDetails, createDefaultUserDTO());
         } catch (NotFoundException ex) {
-            assertThat(ex).hasMessage("User with id 1 not found!");
+            assertThat(ex).hasMessage("User-ul cu id 1 nu a fost gasit!");
         }
     }
 
@@ -330,7 +328,7 @@ class UserServiceTest {
         try {
             userService.deleteUserById(1L);
         } catch (NotFoundException ex) {
-            assertThat(ex).hasMessage("User with id 1 does not exist!");
+            assertThat(ex).hasMessage("Userul cu id-ul 1 nu exista!");
         }
     }
 }

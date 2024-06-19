@@ -18,7 +18,7 @@ public enum BloodType {
     }
 
     @JsonValue
-    String getDisplayName() {
+    public String getDisplayName() {
         return this.displayName;
     }
 

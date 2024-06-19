@@ -16,7 +16,7 @@ public enum Diet {
     }
 
     @JsonValue
-    String getDisplayName() {
+    public String getDisplayName() {
         return this.dietName;
     }
 

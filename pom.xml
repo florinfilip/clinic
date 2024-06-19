@@ -20,6 +20,8 @@
         <ojdbc.version>19.22.0.0</ojdbc.version>
         <junit.jupiter.version>1.19.7</junit.jupiter.version>
         <test.container.version>1.19.7</test.container.version>
+        <apache.poi.version>5.2.5</apache.poi.version>
+        <apache.commons.compress.version>1.26.2</apache.commons.compress.version>
     </properties>
 
 
@@ -51,7 +53,7 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <version>${jjwt.version}</version>
-            <scope>compile</scope> <!-- Not runtime -->
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -145,6 +147,31 @@
             <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${apache.poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${apache.poi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${apache.commons.compress.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

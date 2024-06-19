@@ -32,6 +32,10 @@ public class TestUtils {
                 .build();
     }
 
+    public static MyUserDetails createDefaultMyUserDetails() {
+        return new MyUserDetails(createDefaultUser());
+    }
+
     public static User createDefaultUser() {
         return createUser(
                 EMAIL,
@@ -46,24 +50,50 @@ public class TestUtils {
                         .build());
     }
 
+    public static User createUpdatedUser() {
+        return createUser(
+                UPDATED_EMAIL,
+                UPDATED_PASSWORD,
+                UPDATED_PHONE_NO,
+                Patient.builder()
+                        .user(createUser(UPDATED_EMAIL, UPDATED_PASSWORD, UPDATED_PHONE_NO, createDefaultPatient()))
+                        .firstName(UPDATED_FIRST_NAME)
+                        .lastName(UPDATED_LAST_NAME)
+                        .phoneNumber(UPDATED_PHONE_NO)
+                        .patientDetails(createDefaultPatientDetails())
+                        .build());
+    }
+
     public static List<User> createUserList() {
         return List.of(createDefaultUser(), createDefaultUser(), createDefaultUser());
     }
 
-    public static UserDTO createRegistrationRequest(String username, String lastName, String password, String rPassword, String phoneNumber, String email) {
+    public static UserDTO createUserDTO(String username, String lastName, String password, String rPassword, String phoneNumber, String email) {
         return UserDTO.builder()
                 .firstName(username)
                 .lastName(lastName)
                 .cnp(CNP)
-                .password(password)
-                .repeatPassword(rPassword)
+                .newPassword(password)
+                .confirmPassword(rPassword)
                 .phoneNumber(phoneNumber)
                 .email(email)
                 .build();
     }
 
+    public static UserDTO createDefaultUserDTO(){
+        return UserDTO.builder()
+                .firstName(UPDATED_FIRST_NAME)
+                .lastName(UPDATED_LAST_NAME)
+                .cnp(UPDATED_CNP)
+                .newPassword(UPDATED_PASSWORD)
+                .confirmPassword(UPDATED_PASSWORD)
+                .phoneNumber(UPDATED_PHONE_NO)
+                .email(UPDATED_EMAIL)
+                .build();
+    }
+
     public static UserDTO createDefaultRegistrationRequest() {
-        return createRegistrationRequest(
+        return createUserDTO(
                 "firstName",
                 "lastName",
                 "password",
@@ -139,9 +169,5 @@ public class TestUtils {
                 .height(height)
                 .weight(weight)
                 .build();
-    }
-
-    public static MyUserDetails createDefaultMyUserDetails() {
-        return MyUserDetails.builder().user(createDefaultUser()).build();
     }
 }
