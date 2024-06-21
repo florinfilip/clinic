@@ -106,10 +106,14 @@ public class PatientExcelGenerator implements ExcelService {
             createCell(row, columnCount++, patientDetails.getAlcohol(), style);
             createCell(row, columnCount++, patientDetails.getAllergies(), style);
             createCell(row, columnCount, patientDetails.getConditions(), style);
+            createCell(row, columnCount, patientDetails.getMedications(), style);
         }
     }
 
     private void createCell(Row row, int columnCount, Object value, CellStyle style) {
+        if(value == null){
+            value = "";
+        }
         Cell cell = row.createCell(columnCount);
         switch (value.getClass().getSimpleName()) {
             case "Long" -> cell.setCellValue((Long) value);
