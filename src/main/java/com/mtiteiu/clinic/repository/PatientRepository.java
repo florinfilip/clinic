@@ -4,6 +4,7 @@ import com.mtiteiu.clinic.dto.PatientSelectionCriteriaDTO;
 import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.util.Utils;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,10 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpecificationExecutor<Patient> {
@@ -22,7 +20,8 @@ public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpec
 
     Optional<Patient> findPatientByPhoneNumber(String phoneNumber);
 
-    String PATIENT_DETAILS= "patientDetails";
+    String PATIENT_DETAILS = "patientDetails";
+
     static Specification<Patient> createFilterSpecs(PatientSelectionCriteriaDTO criteria) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -39,6 +38,10 @@ public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpec
             addInPredicate(root, predicates, "civilStatus", criteria.getCivilStatuses());
             addInPredicate(root, predicates, "professionalStatus", criteria.getProfessionalStatuses());
             addInPredicate(root, predicates, "diet", criteria.getDiets());
+
+            addConditionPredicate(root, cb, predicates, "allergies", criteria.getAllergies());
+            addConditionPredicate(root, cb, predicates, "conditions", criteria.getConditions());
+            addConditionPredicate(root, cb, predicates, "medications", criteria.getMedications());
 
             // Add predicates based on boolean criteria
             addEqualPredicate(root, cb, predicates, "smoker", criteria.getSmoker());
@@ -73,7 +76,40 @@ public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpec
                                           String attributeName,
                                           String value) {
         if (Utils.isNotNullOrEmpty(value)) {
-            predicates.add(cb.equal(root.get(PATIENT_DETAILS).get(attributeName), value));
+            if ("Da".equals(value)) {
+
+                Predicate daPredicate = cb.equal(cb.lower(root.get(PATIENT_DETAILS).get(attributeName)), "da");
+                Predicate ocazionalPredicate = cb.equal(cb.lower(root.get(PATIENT_DETAILS).get(attributeName)), "ocazional");
+                predicates.add(cb.or(daPredicate, ocazionalPredicate));
+            } else {
+
+                predicates.add(cb.equal(cb.lower(root.get(PATIENT_DETAILS).get(attributeName)), "nu"));
+            }
+        }
+    }
+
+    private static void addConditionPredicate(Root<Patient> root,
+                                              CriteriaBuilder cb,
+                                              List<Predicate> predicates,
+                                              String attributeName,
+                                              Map<String, Boolean> values) {
+        if (values != null) {
+            values.forEach((key, include) -> {
+                String[] terms = key.split(",");
+                for (String term : terms) {
+                    term = term.trim().toLowerCase();
+                    Path<String> path = root.get(PATIENT_DETAILS).get(attributeName);
+                    Predicate condition;
+                    if (Boolean.TRUE.equals(include)) {
+                        condition = cb.like(cb.lower(path), "%" + term + "%");
+                    } else {
+                        Predicate notLike = cb.notLike(cb.lower(path), "%" + term + "%");
+                        Predicate isNull = cb.isNull(path);
+                        condition = cb.or(notLike, isNull); // Exclude or handle null
+                    }
+                    predicates.add(condition);
+                }
+            });
         }
     }
 

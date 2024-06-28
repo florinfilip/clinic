@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.ValidationException;
 import lombok.*;
-import org.apache.commons.math3.dfp.DfpField;
 
-import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -42,17 +41,21 @@ public class PatientDetails {
 
     private CivilStatus civilStatus;
 
+    private PregnancyStatus pregnancyStatus;
+
+    private PatientStatus patientStatus;
+
     private Diet diet;
 
     private String smoker;
 
     private String alcohol;
 
-    private Double bmi;
-
+    private String bmi;
 
     //    @ElementCollection
 //    @CollectionTable(name = "allergies", joinColumns = @JoinColumn(name = "patient_id"))
+//    @Column(name = "allergy")
     private String allergies;
 
     //    @ElementCollection
@@ -69,7 +72,8 @@ public class PatientDetails {
         return Period.between(dateOfBirth, LocalDate.now()).getYears();
     }
 
-    public Double getBmi() {
+    public String getBmi() {
+        DecimalFormat df = new DecimalFormat("0.00");
 
         if (height == null || weight == null) {
             throw new ValidationException("Height and weight must be provided to calculate BMI.");
@@ -77,8 +81,6 @@ public class PatientDetails {
         if (height <= 0 || weight <= 0) {
             throw new ValidationException("Height and weight must be greater than zero.");
         }
-
-        return BigDecimal.valueOf((weight / (height * height) * 10000)).doubleValue();
-
+        return df.format((weight / (height * height) * 10000));
     }
 }

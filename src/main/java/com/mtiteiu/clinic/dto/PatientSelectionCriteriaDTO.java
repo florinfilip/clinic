@@ -5,6 +5,7 @@ import com.mtiteiu.clinic.model.patient.*;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
@@ -13,6 +14,9 @@ public class PatientSelectionCriteriaDTO {
     private Integer[] ageRange;
     private Integer[] heightRange;
     private Integer[] weightRange;
+
+    private PregnancyStatus pregnancyStatus;
+
     private List<Race> races;
     private List<Religion> religions;
     private List<BloodType> bloodTypes;
@@ -21,8 +25,10 @@ public class PatientSelectionCriteriaDTO {
     private List<Diet> diets;
     private Boolean smoker;
     private Boolean alcohol;
-    private Boolean allergies;
-    private Boolean conditions;
+
+    private Map<String, Boolean> allergies;
+    private Map<String, Boolean> conditions;
+    private Map<String, Boolean> medications;
 
 
     public String getSmoker() {
@@ -36,4 +42,5 @@ public class PatientSelectionCriteriaDTO {
             return "Da";
         } else return "Nu";
     }
+
 }
