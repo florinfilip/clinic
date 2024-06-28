@@ -20,7 +20,7 @@ public class PatientExcelGenerator implements ExcelService {
     String[] headers = {
             "Nume", "Prenume", "Zi de naștere", "Gen", "Telefon", "E-mail",
             "Grupă sanguină", "Religie", "Rasă", "Statut Profesional", "Statut Civil", "Dietă",
-            "Fumător", "Consum Alcool", "Alergii", "Afecțiuni"};
+            "Fumător", "Consum Alcool", "Alergii", "Afecțiuni", "Tratamente"};
 
     public void createExcel(List<Patient> patients, HttpServletResponse response) {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
@@ -105,7 +105,7 @@ public class PatientExcelGenerator implements ExcelService {
             createCell(row, columnCount++, patientDetails.getSmoker(), style);
             createCell(row, columnCount++, patientDetails.getAlcohol(), style);
             createCell(row, columnCount++, patientDetails.getAllergies(), style);
-            createCell(row, columnCount, patientDetails.getConditions(), style);
+            createCell(row, columnCount++, patientDetails.getConditions(), style);
             createCell(row, columnCount, patientDetails.getMedications(), style);
         }
     }

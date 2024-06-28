@@ -43,6 +43,8 @@ public class PatientDetails {
 
     private PregnancyStatus pregnancyStatus;
 
+    private PatientStatus patientStatus;
+
     private Diet diet;
 
     private String smoker;

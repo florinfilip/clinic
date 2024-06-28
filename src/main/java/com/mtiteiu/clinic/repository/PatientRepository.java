@@ -76,7 +76,15 @@ public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpec
                                           String attributeName,
                                           String value) {
         if (Utils.isNotNullOrEmpty(value)) {
-            predicates.add(cb.equal(root.get(PATIENT_DETAILS).get(attributeName), value));
+            if ("Da".equals(value)) {
+
+                Predicate daPredicate = cb.equal(cb.lower(root.get(PATIENT_DETAILS).get(attributeName)), "da");
+                Predicate ocazionalPredicate = cb.equal(cb.lower(root.get(PATIENT_DETAILS).get(attributeName)), "ocazional");
+                predicates.add(cb.or(daPredicate, ocazionalPredicate));
+            } else {
+
+                predicates.add(cb.equal(cb.lower(root.get(PATIENT_DETAILS).get(attributeName)), "nu"));
+            }
         }
     }
 
