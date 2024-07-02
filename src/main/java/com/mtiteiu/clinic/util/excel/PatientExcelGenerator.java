@@ -26,20 +26,17 @@ public class PatientExcelGenerator implements ExcelService {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Patients");
 
-            // Define styles
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle dataStyle = createDataStyle(workbook);
 
-            // Write header line
             writeHeaderLine(sheet, headerStyle);
 
-            // Write data lines
             writeDataLines(patients, sheet, dataStyle);
             for (int i = 0; i < headers.length; i++) {
                 sheet.autoSizeColumn(i);
                 sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 2000);
             }
-            // Write workbook to response output stream
+
             ServletOutputStream outputStream = response.getOutputStream();
             workbook.write(outputStream);
             outputStream.close();

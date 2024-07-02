@@ -7,16 +7,18 @@ import com.mtiteiu.clinic.mapper.PatientDetailsMapper;
 import com.mtiteiu.clinic.model.Person;
 import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.patient.PatientStatus;
 import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.PatientRepository;
-
 import com.mtiteiu.clinic.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,8 +33,8 @@ public class PatientServiceImpl implements PatientService {
     private final PatientRepository patientRepository;
 
     @Override
-    public List<Patient> getPatients() {
-        return patientRepository.findAll();
+    public Page<Patient> getPatients(Pageable pageable) {
+        return patientRepository.findAll(pageable);
     }
 
     @Override
@@ -115,6 +117,18 @@ public class PatientServiceImpl implements PatientService {
         patient.setPatientDetails(details);
         patientRepository.save(patient);
         return details;
+    }
+
+    @Transactional
+    @Override
+    public void updatePatientStatus(Long id, PatientStatus status) {
+        Patient patient = patientRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("User with id %s not found!", id)));
+
+        PatientDetails details = Optional.ofNullable(patient.getPatientDetails()).orElse(new PatientDetails());
+        details.setPatientStatus(status);
+
+        patient.setPatientDetails(details);
+        patientRepository.save(patient);
     }
 
     @Override

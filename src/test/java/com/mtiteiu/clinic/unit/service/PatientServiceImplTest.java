@@ -13,6 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,15 +42,19 @@ class PatientServiceImplTest {
 
     @Test
     void testGetPatients() {
-        //given
-        when(patientRepository.findAll()).thenReturn(createDefaultPatientList());
+        Pageable pageable = PageRequest.of(0, 10); // First page, 10 items per page
+        List<Patient> patients = createDefaultPatientList();
+        Page<Patient> page = new PageImpl<>(patients, pageable, patients.size());
 
-        //when
-        List<Patient> result = patientService.getPatients();
+        when(patientRepository.findAll(any(Pageable.class))).thenReturn(page);
 
+        // When
+        Page<Patient> result = patientService.getPatients(pageable);
 
-        //then
-        assertEquals(4, result.size());
+        // Then
+        assertEquals(4, result.getNumberOfElements()); // Check the number of elements in the page
+        assertEquals(patients, result.getContent()); // Optionally check if the contents are as expected
+
     }
 
     @Test

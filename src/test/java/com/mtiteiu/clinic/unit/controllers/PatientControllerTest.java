@@ -11,6 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -42,18 +46,22 @@ class PatientControllerTest {
     @Test
     void getPatients() {
 
-        //given
+        // given
+        Pageable pageable = PageRequest.of(0, 2); // First page, 2 items per page
         List<Patient> patientList = Arrays.asList(createDefaultPatient(), createDefaultPatient());
-        when(patientService.getPatients()).thenReturn(patientList);
+        Page<Patient> patientPage = new PageImpl<>(patientList, pageable, patientList.size());
 
-        //when
+        when(patientService.getPatients(any(Pageable.class))).thenReturn(patientPage);
 
-        var response = patientController.getPatients();
+        // when
+        ResponseEntity<Page<Patient>> response = patientController.getPatients(pageable); // Ensure your controller method can accept Pageable as a parameter
 
-        //then
-        assertEquals(OK, response.getStatusCode());
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()).hasSize(2);
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(2, response.getBody().getNumberOfElements());
+        assertEquals(2, response.getBody().getContent().size());
+        assertEquals(patientList, response.getBody().getContent()); // Optionally check if the contents are as expected
     }
 
     @Test

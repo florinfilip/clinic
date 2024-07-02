@@ -5,9 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 
 public enum PatientStatus {
-    STABLE("Stabil"),
-    CRITICAL("Critical"),
-    OTHER("Altul");
+    HEALTHY("Sănătos"),
+    LOW_RISK("Risc Scăzut"),
+    MEDIUM_RISK("Risc Mediu"),
+    HIGH_RISK("Risc Ridicat");
 
     private final String displayName;
 
@@ -21,10 +22,10 @@ public enum PatientStatus {
     }
 
     @JsonCreator
-    public static Gender fromValue(String value) {
-        for (Gender gen : Gender.values()) {
-            if (gen.getDisplayName().equalsIgnoreCase(value)) {
-                return gen;
+    public static PatientStatus fromValue(String value) {
+        for (PatientStatus status : PatientStatus.values()) {
+            if (status.getDisplayName().equalsIgnoreCase(value)) {
+                return status;
             }
         }
         throw new IllegalArgumentException("Invalid Gender value: " + value);
