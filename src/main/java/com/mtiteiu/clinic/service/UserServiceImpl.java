@@ -4,6 +4,7 @@ import com.mtiteiu.clinic.dto.UserDTO;
 import com.mtiteiu.clinic.exception.DatabaseActionException;
 import com.mtiteiu.clinic.exception.NotFoundException;
 import com.mtiteiu.clinic.exception.RetrievalException;
+import com.mtiteiu.clinic.mapper.PersonMapper;
 import com.mtiteiu.clinic.mapper.UserMapper;
 import com.mtiteiu.clinic.model.Person;
 import com.mtiteiu.clinic.model.patient.Patient;
@@ -42,7 +43,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PersonRepository personRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
+    private final PersonMapper personMapper;
     @Override
     public List<User> getUsers() {
 
@@ -115,7 +116,7 @@ public class UserServiceImpl implements UserService {
         checkUniqueFieldsValidity(userDetails, updateDetails);
         checkValidPassword(updateDetails);
 
-        UserMapper.INSTANCE.updateUserDetails(updateDetails, updatedUser, bCryptPasswordEncoder);
+        UserMapper.INSTANCE.updateUserDetails(updateDetails, updatedUser, bCryptPasswordEncoder, personMapper);
 
         try {
             var user = userRepository.save(updatedUser);

@@ -14,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.mtiteiu.clinic.model.user.UserRoles.MEDIC;
+
 
 @EnableWebSecurity
 @Configuration
@@ -28,8 +30,10 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(HttpMethod.POST, "/auth", "/authenticate").permitAll()
-                                .anyRequest().permitAll())
+                        auth.requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                                .requestMatchers("/users/add").permitAll()
+                                .requestMatchers("/medics/**").hasAuthority(MEDIC.name())
+                                .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authenticationProvider(authenticationProvider)
                 .sessionManagement(ses -> ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

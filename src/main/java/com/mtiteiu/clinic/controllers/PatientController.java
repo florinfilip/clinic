@@ -7,6 +7,8 @@ import com.mtiteiu.clinic.service.PatientService;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,8 +27,14 @@ public class PatientController {
     private final PatientService patientService;
 
     @PreAuthorize("isAuthenticated()")
+    @GetMapping("/page")
+    public ResponseEntity<Page<Patient>> getPatientsPage(Pageable pageable) {
+        return ResponseEntity.ok().body(patientService.getPatients(pageable));
+    }
+
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
-    public ResponseEntity<List<Patient>> getPatients() {
+    public ResponseEntity<List<Patient>> getPatients(){
         return ResponseEntity.ok().body(patientService.getPatients());
     }
 

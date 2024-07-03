@@ -7,16 +7,18 @@ import com.mtiteiu.clinic.mapper.PatientDetailsMapper;
 import com.mtiteiu.clinic.model.Person;
 import com.mtiteiu.clinic.model.patient.Patient;
 import com.mtiteiu.clinic.model.patient.PatientDetails;
+import com.mtiteiu.clinic.model.patient.PatientStatus;
 import com.mtiteiu.clinic.model.user.MyUserDetails;
 import com.mtiteiu.clinic.model.user.User;
 import com.mtiteiu.clinic.repository.PatientRepository;
-
 import com.mtiteiu.clinic.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +31,11 @@ public class PatientServiceImpl implements PatientService {
     private final UserRepository userRepository;
 
     private final PatientRepository patientRepository;
+
+    @Override
+    public Page<Patient> getPatients(Pageable pageable) {
+        return patientRepository.findAll(pageable);
+    }
 
     @Override
     public List<Patient> getPatients() {
@@ -101,7 +108,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientDetails updatePatientDetails(MyUserDetails userDetails, PatientDetails updatedDetails) {
 
-        Long id = userDetails.getUserId();
+        Long id = userDetails.user().getPerson().getId();
 
         Patient patient = patientRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Patient with id %s not found!", id)));
@@ -110,11 +117,29 @@ public class PatientServiceImpl implements PatientService {
         details.setPatient(patient);
         details.setAge(details.getUserAge());
 
-        PatientDetailsMapper.INSTANCE.updatePatientDetails(updatedDetails, details);
+        try {
+            PatientDetailsMapper.INSTANCE.updatePatientDetails(updatedDetails, details);
+            patient.setPatientDetails(details);
+            patientRepository.save(patient);
+        } catch (Exception ex) {
+            log.error("Error while trying to create pateint details: {}", ex.getMessage());
+        }
+
+        log.info("Patient Details saved for {}", patient.getUser().getEmail());
+        return details;
+    }
+
+    @Transactional
+    @Override
+    public void updatePatientStatus(Long id, PatientStatus status) {
+        Patient patient = patientRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("User with id %s not found!", id)));
+
+        PatientDetails details = Optional.ofNullable(patient.getPatientDetails()).orElse(new PatientDetails());
+        details.setPatientStatus(status);
 
         patient.setPatientDetails(details);
         patientRepository.save(patient);
-        return details;
+        log.info("Status for patient with id {} changed to {}", id, status);
     }
 
     @Override

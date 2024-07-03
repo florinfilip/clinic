@@ -2,14 +2,13 @@ package com.mtiteiu.clinic.controllers;
 
 import com.mtiteiu.clinic.dto.PatientSelectionCriteriaDTO;
 import com.mtiteiu.clinic.model.patient.Patient;
+import com.mtiteiu.clinic.model.patient.PatientStatus;
 import com.mtiteiu.clinic.service.PatientService;
 import com.mtiteiu.clinic.util.excel.ExcelService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,6 +35,13 @@ public class MedicController {
         response.setHeader("Content-Disposition", "attachment; filename=Pacienti.xlsx");
 
         excelService.createExcel(patientList, response);
+    }
+
+    @PatchMapping("/patients/status/{id}")
+    public ResponseEntity<String> updatePatientStatus(@PathVariable Long id, @RequestBody String status) {
+        PatientStatus patientStatus = PatientStatus.fromValue(status);
+        patientService.updatePatientStatus(id, patientStatus);
+        return ResponseEntity.ok("Patient status updated successfully!");
     }
 
 

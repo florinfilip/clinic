@@ -45,6 +45,8 @@ public class PatientDetails {
 
     private PatientStatus patientStatus;
 
+    private TestType testType;
+
     private Diet diet;
 
     private String smoker;
@@ -53,13 +55,8 @@ public class PatientDetails {
 
     private String bmi;
 
-    //    @ElementCollection
-//    @CollectionTable(name = "allergies", joinColumns = @JoinColumn(name = "patient_id"))
-//    @Column(name = "allergy")
     private String allergies;
 
-    //    @ElementCollection
-//    @CollectionTable(name = "vices", joinColumns = @JoinColumn(name = "patient_id"))
     private String conditions;
 
     private String medications;
