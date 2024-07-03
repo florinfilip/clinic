@@ -16,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -25,9 +27,15 @@ public class PatientController {
     private final PatientService patientService;
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping
-    public ResponseEntity<Page<Patient>> getPatients(Pageable pageable) {
+    @GetMapping("/page")
+    public ResponseEntity<Page<Patient>> getPatientsPage(Pageable pageable) {
         return ResponseEntity.ok().body(patientService.getPatients(pageable));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping
+    public ResponseEntity<List<Patient>> getPatients(){
+        return ResponseEntity.ok().body(patientService.getPatients());
     }
 
     @GetMapping("/{id}")

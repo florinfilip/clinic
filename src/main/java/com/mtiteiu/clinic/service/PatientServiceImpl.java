@@ -38,6 +38,11 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
+    public List<Patient> getPatients() {
+        return patientRepository.findAll();
+    }
+
+    @Override
     public Patient getPatientById(Long id) {
         return patientRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Pacientul cu id-ul %s nu a fost gasit!", id)));
@@ -103,7 +108,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientDetails updatePatientDetails(MyUserDetails userDetails, PatientDetails updatedDetails) {
 
-        Long id = userDetails.getUserId();
+        Long id = userDetails.user().getPerson().getId();
 
         Patient patient = patientRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Patient with id %s not found!", id)));
@@ -112,10 +117,15 @@ public class PatientServiceImpl implements PatientService {
         details.setPatient(patient);
         details.setAge(details.getUserAge());
 
-        PatientDetailsMapper.INSTANCE.updatePatientDetails(updatedDetails, details);
+        try {
+            PatientDetailsMapper.INSTANCE.updatePatientDetails(updatedDetails, details);
+            patient.setPatientDetails(details);
+            patientRepository.save(patient);
+        } catch (Exception ex) {
+            log.error("Error while trying to create pateint details: {}", ex.getMessage());
+        }
 
-        patient.setPatientDetails(details);
-        patientRepository.save(patient);
+        log.info("Patient Details saved for {}", patient.getUser().getEmail());
         return details;
     }
 
@@ -129,6 +139,7 @@ public class PatientServiceImpl implements PatientService {
 
         patient.setPatientDetails(details);
         patientRepository.save(patient);
+        log.info("Status for patient with id {} changed to {}", id, status);
     }
 
     @Override

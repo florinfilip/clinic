@@ -54,7 +54,7 @@ class PatientControllerTest {
         when(patientService.getPatients(any(Pageable.class))).thenReturn(patientPage);
 
         // when
-        ResponseEntity<Page<Patient>> response = patientController.getPatients(pageable); // Ensure your controller method can accept Pageable as a parameter
+        ResponseEntity<Page<Patient>> response = patientController.getPatientsPage(pageable); // Ensure your controller method can accept Pageable as a parameter
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());

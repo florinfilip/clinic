@@ -14,6 +14,7 @@ public class PatientSelectionCriteriaDTO {
     private Integer[] ageRange;
     private Integer[] heightRange;
     private Integer[] weightRange;
+    private Integer[] bmiRange;
 
     private PregnancyStatus pregnancyStatus;
 

@@ -26,12 +26,12 @@ public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpec
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // Add predicates based on range criteria
+
             addRangePredicate(root, cb, predicates, "age", criteria.getAgeRange());
             addRangePredicate(root, cb, predicates, "weight", criteria.getWeightRange());
             addRangePredicate(root, cb, predicates, "height", criteria.getHeightRange());
+//            addRangePredicate(root, cb, predicates, "bmi", criteria.getBmiRange());
 
-            // Add predicates based on enum criteria
             addInPredicate(root, predicates, "race", criteria.getRaces());
             addInPredicate(root, predicates, "religion", criteria.getReligions());
             addInPredicate(root, predicates, "bloodType", criteria.getBloodTypes());
@@ -43,7 +43,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpec
             addConditionPredicate(root, cb, predicates, "conditions", criteria.getConditions());
             addConditionPredicate(root, cb, predicates, "medications", criteria.getMedications());
 
-            // Add predicates based on boolean criteria
             addEqualPredicate(root, cb, predicates, "smoker", criteria.getSmoker());
             addEqualPredicate(root, cb, predicates, "alcohol", criteria.getAlcohol());
 

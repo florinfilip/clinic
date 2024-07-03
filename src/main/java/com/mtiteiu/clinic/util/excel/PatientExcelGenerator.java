@@ -19,7 +19,7 @@ import java.util.List;
 public class PatientExcelGenerator implements ExcelService {
     String[] headers = {
             "Nume", "Prenume", "Zi de naștere", "Gen", "Telefon", "E-mail",
-            "Grupă sanguină", "Religie", "Rasă", "Statut Profesional", "Statut Civil", "Dietă",
+            "Grupă sanguină", "Religie", "Rasă", "Statut Profesional", "Statut Civil", "Dietă", "Indice Masă Corporală",
             "Fumător", "Consum Alcool", "Alergii", "Afecțiuni", "Tratamente"};
 
     public void createExcel(List<Patient> patients, HttpServletResponse response) {
@@ -31,7 +31,11 @@ public class PatientExcelGenerator implements ExcelService {
 
             writeHeaderLine(sheet, headerStyle);
 
-            writeDataLines(patients, sheet, dataStyle);
+            var filteredPatients = patients.stream()
+                    .filter((user -> user.getUser() != null))
+                    .toList();
+
+            writeDataLines(filteredPatients, sheet, dataStyle);
             for (int i = 0; i < headers.length; i++) {
                 sheet.autoSizeColumn(i);
                 sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 2000);
@@ -99,6 +103,7 @@ public class PatientExcelGenerator implements ExcelService {
             createCell(row, columnCount++, patientDetails.getProfessionalStatus().getDisplayName(), style);
             createCell(row, columnCount++, patientDetails.getCivilStatus().getStatus(), style);
             createCell(row, columnCount++, patientDetails.getDiet().getDisplayName(), style);
+            createCell(row, columnCount++, patientDetails.getBmi(), style);
             createCell(row, columnCount++, patientDetails.getSmoker(), style);
             createCell(row, columnCount++, patientDetails.getAlcohol(), style);
             createCell(row, columnCount++, patientDetails.getAllergies(), style);
@@ -108,7 +113,7 @@ public class PatientExcelGenerator implements ExcelService {
     }
 
     private void createCell(Row row, int columnCount, Object value, CellStyle style) {
-        if(value == null){
+        if (value == null) {
             value = "";
         }
         Cell cell = row.createCell(columnCount);
